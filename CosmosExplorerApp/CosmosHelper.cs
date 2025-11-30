@@ -51,7 +51,7 @@ namespace cloudApp
 
             while (iterator.HasMoreResults)
             {
-                foreach (var db in await iterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
                     dbNames.Add(db.Id);
             }
 
@@ -70,7 +70,7 @@ namespace cloudApp
 
             while (iterator.HasMoreResults)
             {
-                foreach (var db in await iterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
                     count++;
             }
 
@@ -89,7 +89,7 @@ namespace cloudApp
 
             while (dbIterator.HasMoreResults)
             {
-                foreach (var db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
                 {
                     Database dbObj = client.GetDatabase(db.Id);
 
@@ -98,7 +98,7 @@ namespace cloudApp
 
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (var table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
                             tables.Add($"{db.Id} - {table.Id}");
                     }
                 }
@@ -118,7 +118,7 @@ namespace cloudApp
             FeedIterator<ContainerProperties> iterator = dbObj.GetContainerQueryIterator<ContainerProperties>();
             while (iterator.HasMoreResults)
             {
-                foreach (var table in await iterator.ReadNextAsync())
+                foreach (ContainerProperties table in await iterator.ReadNextAsync())
                     tables.Add(table.Id);
             }
 
@@ -137,7 +137,7 @@ namespace cloudApp
 
             while (iterator.HasMoreResults)
             {
-                foreach (var db in await iterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
                 {
                     if (db.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                         filtered.Add(db.Id);
@@ -159,7 +159,7 @@ namespace cloudApp
 
             while (dbIterator.HasMoreResults)
             {
-                foreach (var db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
                 {
                     Database dbObj = client.GetDatabase(db.Id);
 
@@ -168,7 +168,7 @@ namespace cloudApp
 
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (var table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
                         {
                             if (table.Id.Length > minLength)
                                 result.Add($"{db.Id}-{table.Id}");
@@ -192,7 +192,7 @@ namespace cloudApp
 
             while (dbIterator.HasMoreResults)
             {
-                foreach (var db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
                 {
                     Database dbObj = client.GetDatabase(db.Id);
 
@@ -203,7 +203,7 @@ namespace cloudApp
 
                     while (tableIterator.HasMoreResults && !found)
                     {
-                        foreach (var table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
                         {
                             if (table.Id == tableName)
                             {
@@ -231,7 +231,7 @@ namespace cloudApp
 
             while (dbIterator.HasMoreResults)
             {
-                foreach (var db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
                 {
                     int count = 0;
                     Database dbObj = client.GetDatabase(db.Id);
@@ -241,7 +241,7 @@ namespace cloudApp
 
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (var table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
                             count++;
                     }
 
@@ -264,7 +264,7 @@ namespace cloudApp
 
             while (dbIterator.HasMoreResults)
             {
-                foreach (var db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
                 {
                     int count = 0;
                     Database dbObj = client.GetDatabase(db.Id);
@@ -274,7 +274,7 @@ namespace cloudApp
 
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (var table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
                             count++;
                     }
 
