@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CosmosExplorerApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4835f3180ed3d7ec2303eecb283130a1f7600ecd")]
 [assembly: System.Reflection.AssemblyProductAttribute("CosmosExplorerApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CosmosExplorerApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
