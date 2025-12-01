@@ -161,7 +161,7 @@ partial class CosmosExplorerForm
         this.btnCountDatabases = new Button();
         this.btnCountDatabases.Text = "Count Databases";
         this.btnCountDatabases.Location = new System.Drawing.Point(540, 270); // next to listDb
-        this.btnCountDatabases.Size = new System.Drawing.Size(150, 35);
+        this.btnCountDatabases.AutoSize = true;
         this.btnCountDatabases.Click += BtnCountDatabases_Click;
         this.tabDatabase.Controls.Add(this.btnCountDatabases);
 
