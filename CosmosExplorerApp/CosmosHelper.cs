@@ -7,16 +7,15 @@ namespace cloudApp
 {
     public class CosmosHelper
     {
-        private CosmosClient client;
-
+        private CosmosClient cosmosClient;
         public CosmosHelper(string uri, string key)
         {
-            client = new CosmosClient(uri, key);
+            cosmosClient = new CosmosClient(uri, key);
         }
 
         public CosmosClient GetClient()
         {
-            return client;
+            return cosmosClient;
         }
 
         // --------------------------------------------------------------------
@@ -24,19 +23,19 @@ namespace cloudApp
         // --------------------------------------------------------------------
         public async Task<(bool created, string status)> CreateDatabaseAsync(string db)
         {
-            DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(db);
-            return (response.StatusCode == System.Net.HttpStatusCode.Created,
-                    response.StatusCode.ToString());
+            DatabaseResponse dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(db);
+            return (dbResponse.StatusCode == System.Net.HttpStatusCode.Created,
+                    dbResponse.StatusCode.ToString());
         }
 
         public async Task<(bool created, string status)> CreateTableAsync(string db, string table)
         {
-            Database dbObj = client.GetDatabase(db);
-            ContainerResponse response =
+            Database dbObj = cosmosClient.GetDatabase(db);
+            ContainerResponse cntrResponse =
                 await dbObj.CreateContainerIfNotExistsAsync(table, "/id");
 
-            return (response.StatusCode == System.Net.HttpStatusCode.Created,
-                    response.StatusCode.ToString());
+            return (cntrResponse.StatusCode == System.Net.HttpStatusCode.Created,
+                    cntrResponse.StatusCode.ToString());
         }
 
         // --------------------------------------------------------------------
@@ -46,13 +45,13 @@ namespace cloudApp
         {
             List<string> dbNames = new List<string>();
 
-            FeedIterator<DatabaseProperties> iterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
+            FeedIterator<DatabaseProperties> dbIterator =
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
 
-            while (iterator.HasMoreResults)
+            while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
-                    dbNames.Add(db.Id);
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
+                    dbNames.Add(currentDBprop.Id);
             }
 
             return dbNames;
@@ -63,18 +62,15 @@ namespace cloudApp
         // --------------------------------------------------------------------
         public async Task<int> CountDatabasesAsync()
         {
-            int count = 0;
-
-            FeedIterator<DatabaseProperties> iterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
-            while (iterator.HasMoreResults)
+            int numOfDbs = 0;
+            FeedIterator<DatabaseProperties> dbIterator =
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
+            while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
-                    count++;
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
+                    numOfDbs++;
             }
-
-            return count;
+            return numOfDbs;
         }
 
         // --------------------------------------------------------------------
@@ -83,27 +79,22 @@ namespace cloudApp
         public async Task<List<string>> GetTablesAsync()
         {
             List<string> tables = new List<string>();
-
             FeedIterator<DatabaseProperties> dbIterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
             while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
-                    Database dbObj = client.GetDatabase(db.Id);
-
+                    Database dbObj = cosmosClient.GetDatabase(currentDBprop.Id);
                     FeedIterator<ContainerProperties> tableIterator =
                         dbObj.GetContainerQueryIterator<ContainerProperties>();
-
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
-                            tables.Add($"{db.Id} - {table.Id}");
+                        foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
+                            tables.Add($"{currentDBprop.Id} - {currentTBprop.Id}");
                     }
                 }
             }
-
             return tables;
         }
 
@@ -113,15 +104,13 @@ namespace cloudApp
         public async Task<List<string>> GetTablesAsync(string dbName)
         {
             List<string> tables = new List<string>();
-            Database dbObj = client.GetDatabase(dbName);
-
-            FeedIterator<ContainerProperties> iterator = dbObj.GetContainerQueryIterator<ContainerProperties>();
-            while (iterator.HasMoreResults)
+            Database dbObj = cosmosClient.GetDatabase(dbName);
+            FeedIterator<ContainerProperties> tableIterator = dbObj.GetContainerQueryIterator<ContainerProperties>();
+            while (tableIterator.HasMoreResults)
             {
-                foreach (ContainerProperties table in await iterator.ReadNextAsync())
-                    tables.Add(table.Id);
+                foreach (ContainerProperties currentTable in await tableIterator.ReadNextAsync())
+                    tables.Add(currentTable.Id);
             }
-
             return tables;
         }
 
@@ -130,21 +119,18 @@ namespace cloudApp
         // --------------------------------------------------------------------
         public async Task<List<string>> GetDBsStartingWithAsync(string prefix)
         {
-            List<string> filtered = new List<string>();
-
-            FeedIterator<DatabaseProperties> iterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
-            while (iterator.HasMoreResults)
+            List<string> filteredDbs = new List<string>();
+            FeedIterator<DatabaseProperties> dbIterator =
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
+            while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await iterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
-                    if (db.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                        filtered.Add(db.Id);
+                    if (currentDBprop.Id.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                        filteredDbs.Add(currentDBprop.Id);
                 }
             }
-
-            return filtered;
+            return filteredDbs;
         }
 
         // --------------------------------------------------------------------
@@ -153,30 +139,25 @@ namespace cloudApp
         public async Task<List<string>> GetTablesLongerThanAsync(int minLength)
         {
             List<string> result = new List<string>();
-
             FeedIterator<DatabaseProperties> dbIterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
             while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
-                    Database dbObj = client.GetDatabase(db.Id);
-
+                    Database dbObj = cosmosClient.GetDatabase(currentDBprop.Id);
                     FeedIterator<ContainerProperties> tableIterator =
                         dbObj.GetContainerQueryIterator<ContainerProperties>();
-
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
                         {
-                            if (table.Id.Length > minLength)
-                                result.Add($"{db.Id}-{table.Id}");
+                            if (currentTBprop.Id.Length > minLength)
+                                result.Add($"{currentDBprop.Id}-{currentTBprop.Id}");
                         }
                     }
                 }
             }
-
             return result;
         }
 
@@ -186,28 +167,23 @@ namespace cloudApp
         public async Task<List<string>> GetDBsContainingTableAsync(string tableName)
         {
             List<string> result = new List<string>();
-
             FeedIterator<DatabaseProperties> dbIterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
             while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
-                    Database dbObj = client.GetDatabase(db.Id);
-
+                    Database dbObj = cosmosClient.GetDatabase(currentDBprop.Id);
                     FeedIterator<ContainerProperties> tableIterator =
                         dbObj.GetContainerQueryIterator<ContainerProperties>();
-
                     bool found = false;
-
                     while (tableIterator.HasMoreResults && !found)
                     {
-                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
                         {
-                            if (table.Id == tableName)
+                            if (currentTBprop.Id == tableName)
                             {
-                                result.Add(db.Id);
+                                result.Add(currentDBprop.Id);
                                 found = true;
                                 break;
                             }
@@ -215,7 +191,6 @@ namespace cloudApp
                     }
                 }
             }
-
             return result;
         }
 
@@ -224,31 +199,25 @@ namespace cloudApp
         // --------------------------------------------------------------------
         public async Task<List<string>> CountTablesPerDBAsync()
         {
-            List<string> result = new List<string>();
-
+            List<string> result = [];
             FeedIterator<DatabaseProperties> dbIterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
             while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
-                    int count = 0;
-                    Database dbObj = client.GetDatabase(db.Id);
-
+                    int numOfTBs = 0;
+                    Database dbObj = cosmosClient.GetDatabase(currentDBprop.Id);
                     FeedIterator<ContainerProperties> tableIterator =
                         dbObj.GetContainerQueryIterator<ContainerProperties>();
-
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
-                            count++;
+                        foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
+                            numOfTBs++;
                     }
-
-                    result.Add($"{db.Id} - {count} tables");
+                    result.Add($"{currentDBprop.Id} - {numOfTBs} tables");
                 }
             }
-
             return result;
         }
 
@@ -258,31 +227,27 @@ namespace cloudApp
         public async Task<List<string>> GetDBsWithExactTableCountAsync(int num)
         {
             List<string> result = new List<string>();
-
             FeedIterator<DatabaseProperties> dbIterator =
-                client.GetDatabaseQueryIterator<DatabaseProperties>();
-
+                cosmosClient.GetDatabaseQueryIterator<DatabaseProperties>();
             while (dbIterator.HasMoreResults)
             {
-                foreach (DatabaseProperties db in await dbIterator.ReadNextAsync())
+                foreach (DatabaseProperties currentDBprop in await dbIterator.ReadNextAsync())
                 {
                     int count = 0;
-                    Database dbObj = client.GetDatabase(db.Id);
+                    Database dbObj = cosmosClient.GetDatabase(currentDBprop.Id);
 
                     FeedIterator<ContainerProperties> tableIterator =
                         dbObj.GetContainerQueryIterator<ContainerProperties>();
 
                     while (tableIterator.HasMoreResults)
                     {
-                        foreach (ContainerProperties table in await tableIterator.ReadNextAsync())
+                        foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
                             count++;
                     }
-
                     if (count == num)
-                        result.Add(db.Id);
+                        result.Add(currentDBprop.Id);
                 }
             }
-
             return result;
         }
     }
