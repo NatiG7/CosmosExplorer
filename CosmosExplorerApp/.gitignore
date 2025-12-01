@@ -1,0 +1,82 @@
+# Visual Studio / .NET WinForms / Azure - .gitignore
+
+# User-specific
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.sln.docstates
+
+# Visual Studio Code / Visual Studio settings
+.vs/
+.vscode/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+build/
+out/
+TestResults/
+
+# NuGet packages
+packages/
+*.nupkg
+# NuGet cache & lock files
+project.lock.json
+project.assets.json
+*.nuget.props
+*.nuget.targets
+
+# Rider
+.idea/
+*.sln.iml
+
+# Publish / deployment / Azure
+*.Publish.xml
+*.publishsettings
+.deployment
+*.azurePubxml
+Properties/PublishProfiles/*.pubxml.user
+Properties/PublishProfiles/*.pubxml.user.user
+
+# Azure Functions / local settings (if present)
+local.settings.json
+
+# Visual Studio temp / generated files
+*.cache
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.ipch/
+*.opendb
+*.log
+
+# Database & data files
+*.mdf
+*.ldf
+*.db
+*.db-shm
+*.db-wal
+*.dbmdl
+
+# Test results
+*.trx
+*.coverage
+*.coveragexml
+
+# OS files
+Thumbs.db
+ehthumbs.db
+.DS_Store
+
+# Secrets / environment-specific configs
+appsettings*.Local.json
+appsettings*.Development.json
+secrets.json
+.env
+
+# Misc
+*.vsix
+.vsconfig
