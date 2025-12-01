@@ -57,9 +57,5 @@ dotnet restore
 dotnet run
 ```
 
-
-
-
-
-[dbtab]: screenshots/databases_tab.png
-[ctab]: screenshots/tables_tab.png
+[dbtab]: Screenshots/databases_tab.png
+[ctab]: Screenshots/tables_tab.png
