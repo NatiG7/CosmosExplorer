@@ -163,6 +163,33 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    private async void BtnFilterDb_Click(object sender, EventArgs e)
+    {
+        if (helper == null)
+        {
+            MessageBox.Show("Client not initialized. Load keys first.", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        string prefix = txtDbPrefix.Text.Trim();
+        if (string.IsNullOrEmpty(prefix))
+        {
+            MessageBox.Show("Please enter a prefix.", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        List<string> filteredDbs = await helper.GetDBsStartingWithAsync(prefix);
+        cmbFilteredDbs.Items.Clear();
+        foreach (string db in filteredDbs)
+            cmbFilteredDbs.Items.Add(db);
+        // ➜ Auto-select first item
+        if (cmbFilteredDbs.Items.Count > 0)
+            cmbFilteredDbs.SelectedIndex = 0;
+        else
+            MessageBox.Show("No databases found with that prefix.", "Info",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+
 
     private async void BtnRefreshTables_Click(object sender, EventArgs e)
     {

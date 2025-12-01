@@ -32,6 +32,11 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnRefreshTables;
     private System.Windows.Forms.Label lblTableCount;
     private System.Windows.Forms.Button btnCountDatabases;
+    private System.Windows.Forms.Label lblFilterDb;
+    private System.Windows.Forms.TextBox txtDbPrefix;
+    private System.Windows.Forms.Button btnFilterDb;
+    private System.Windows.Forms.Label lblFilterResults;
+    private System.Windows.Forms.ComboBox cmbFilteredDbs;
 
 
     /// <summary>
@@ -60,7 +65,7 @@ partial class CosmosExplorerForm
         // ================================
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(800, 600);
+        this.ClientSize = new System.Drawing.Size(870, 800);
         this.Text = "Cosmos Explorer App";
 
         // ================================
@@ -72,7 +77,7 @@ partial class CosmosExplorerForm
         this.tabDocuments = new System.Windows.Forms.TabPage();
 
         this.tabControl1.Location = new System.Drawing.Point(10, 10);
-        this.tabControl1.Size = new System.Drawing.Size(760, 500);
+        this.tabControl1.Size = new System.Drawing.Size(850, 770);
 
         this.tabDatabase.Text = "Databases";
         this.tabContainers.Text = "Containers";
@@ -164,6 +169,45 @@ partial class CosmosExplorerForm
         this.btnCountDatabases.AutoSize = true;
         this.btnCountDatabases.Click += BtnCountDatabases_Click;
         this.tabDatabase.Controls.Add(this.btnCountDatabases);
+
+        #region Database Filter UI
+
+        // Label: Filter DBs
+        this.lblFilterDb = new System.Windows.Forms.Label();
+        this.lblFilterDb.Text = "Filter DBs starting with:";
+        this.lblFilterDb.Location = new System.Drawing.Point(20, 485);
+        this.lblFilterDb.AutoSize = true;
+        this.tabDatabase.Controls.Add(this.lblFilterDb);
+
+        // TextBox: Filter prefix
+        this.txtDbPrefix = new System.Windows.Forms.TextBox();
+        this.txtDbPrefix.Location = new System.Drawing.Point(210, 480);
+        this.txtDbPrefix.Width = 200;
+        this.tabDatabase.Controls.Add(this.txtDbPrefix);
+
+        // Button: Filter DBs
+        this.btnFilterDb = new System.Windows.Forms.Button();
+        this.btnFilterDb.Text = "Filter";
+        this.btnFilterDb.Location = new System.Drawing.Point(430, 478);
+        this.btnFilterDb.Size = new System.Drawing.Size(100, 30);
+        this.btnFilterDb.Click += BtnFilterDb_Click;
+        this.tabDatabase.Controls.Add(this.btnFilterDb);
+
+        // Label: Filter Results
+        this.lblFilterResults = new System.Windows.Forms.Label();
+        this.lblFilterResults.Text = "Filtered Databases:";
+        this.lblFilterResults.AutoSize = true;
+        this.lblFilterResults.Location = new System.Drawing.Point(20, 535);
+        this.tabDatabase.Controls.Add(this.lblFilterResults);
+
+        // ComboBox: Filter results
+        this.cmbFilteredDbs = new System.Windows.Forms.ComboBox();
+        this.cmbFilteredDbs.Location = new System.Drawing.Point(250, 530);   // aligned with textbox
+        this.cmbFilteredDbs.Width = 250;
+        this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
+        this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
+
+        #endregion
 
         #endregion
 
