@@ -7,7 +7,7 @@ using cloudApp;
 
 public partial class CosmosExplorerForm : Form
 {
-    private CosmosHelper? helper;
+    private CosmosHelper helper;
     private CosmosClient? _client;
 
     public CosmosExplorerForm()
@@ -48,9 +48,16 @@ public partial class CosmosExplorerForm : Form
             foreach (var db in dbs)
                 listDb.Items.Add(db);
 
-            // Update form title with count
-            int count = await helper.CountDatabasesAsync();
-            this.Text = $"Cosmos Explorer App - Total Databases: {count}";
+            // Update form title with connection speed
+            double speedMs = await MeasureConnectionSpeedAsync();
+            if (speedMs >= 0)
+            {
+                this.Text = $"Cosmos DB Explorer - Connected (Latency: {speedMs:F2} ms)";
+            }
+            else
+            {
+                this.Text = "Cosmos DB Explorer - Connected (Latency: N/A)";
+            }
         }
         catch (Exception ex)
         {
@@ -60,6 +67,24 @@ public partial class CosmosExplorerForm : Form
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
+    }
+
+    private async Task<double> MeasureConnectionSpeedAsync()
+    {
+        if (helper == null) return -1;
+
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        try
+        {
+            // Lightweight call to Cosmos DB
+            await helper.GetDatabasesAsync();
+        }
+        catch
+        {
+            return -1; // failed to connect
+        }
+        sw.Stop();
+        return sw.Elapsed.TotalMilliseconds; // return milliseconds
     }
 
     // ----------------------------------------------------------
@@ -79,6 +104,7 @@ public partial class CosmosExplorerForm : Form
         _client = helper.GetClient();
 
         await RefreshDatabasesAsync();
+        await LoadDatabasesIntoComboBox();
     }
 
     // ----------------------------------------------------------
@@ -114,5 +140,154 @@ public partial class CosmosExplorerForm : Form
         );
 
         await RefreshDatabasesAsync();
+    }
+
+    private async void BtnCountDatabases_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (helper == null)
+            {
+                MessageBox.Show("Client not initialized. Load keys first.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            int count = await helper.CountDatabasesAsync();
+            MessageBox.Show($"Total databases: {count}", "Database Count",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error counting databases: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private async void BtnRefreshTables_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (_client == null)
+            {
+                MessageBox.Show("Cosmos Client is not initialized!",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+            string? selectedDb = comboDbTables.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(selectedDb))
+            {
+                MessageBox.Show("No database selected!",
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                return;
+            }
+            listTables.Items.Clear();
+            List<string> tables = await helper.GetTablesAsync(selectedDb);
+            foreach (string table in tables) listTables.Items.Add(table);
+
+            lblTableCount.Text = $"Tables/Containers: {tables.Count}";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Error refreshing tables/containers: {ex.Message}",
+                "Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+        }
+    }
+
+    private async void BtnCreateContainer_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (helper == null)
+            {
+                MessageBox.Show("Client not initialized. Load keys first.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string? selectedDb = comboDbTables.SelectedItem?.ToString();
+            if (string.IsNullOrEmpty(selectedDb))
+            {
+                MessageBox.Show("Please select a database first.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            string tableName = txtContainerName.Text.Trim();
+
+            if (string.IsNullOrEmpty(tableName))
+            {
+                MessageBox.Show("Container name is required.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            (bool created, string status) = await helper.CreateTableAsync(selectedDb, tableName);
+
+            if (created)
+                MessageBox.Show($"Table created: {tableName}", "Success",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+                MessageBox.Show($"Table existed already. Status: {status}", "Info",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            BtnRefreshTables_Click(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error creating table: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private async Task LoadDatabasesIntoComboBox()
+    {
+        if (helper == null)
+        {
+            MessageBox.Show("Client not initialized. Load keys first.",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        // call the helper method to get the list of databases
+        List<string> dbs = await helper.GetDatabasesAsync();
+        comboDbTables.Items.Clear();
+
+        foreach (string db in dbs)
+        // iterate through the list and add each database to the combo box
+        {
+            comboDbTables.Items.Add(db);
+        }
+
+        if (comboDbTables.Items.Count > 0)
+        {
+            comboDbTables.SelectedIndex = 0; // Select the first item by default
+        }
+    }
+    private async void ComboDbTables_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        string? selectedDb = comboDbTables.SelectedItem?.ToString();
+        if (string.IsNullOrEmpty(selectedDb))
+            return;
+
+        await RefreshTablesList(selectedDb);
+    }
+    private async Task RefreshTablesList(string dbName)
+    {
+        if (helper == null || string.IsNullOrEmpty(dbName))
+            return;
+
+        List<string> tables = await helper.GetTablesAsync(dbName);
+
+        listTables.Items.Clear();
+        foreach (string table in tables)
+            listTables.Items.Add(table);
     }
 }
