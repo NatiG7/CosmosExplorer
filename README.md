@@ -61,5 +61,5 @@ dotnet run
 
 
 
-[dbtab]: Screenshots/databases_tab.png
-[ctab]: Screenshots/tables_tab.png
+[dbtab]: screenshots/databases_tab.png
+[ctab]: screenshots/tables_tab.png
