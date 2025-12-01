@@ -29,11 +29,11 @@ A Windows Forms app to explore and manage Azure Cosmos DB databases, containers,
 
 ### Databases Tab
 
-![Databases Tab](screenshots/databases_tab.png)
+![Databases Tab][dbtab]
 
 ### Containers Tab
 
-![Containers Tab](screenshots/tables_tab.png)
+![Containers Tab][ctab]
 
 ## Notes
 
@@ -56,3 +56,10 @@ dotnet restore
 ```bash
 dotnet run
 ```
+
+
+
+
+
+[dbtab]: Screenshots/databases_tab.png
+[ctab]: Screenshots/tables_tab.png
