@@ -44,6 +44,10 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnCheckDb;
     private System.Windows.Forms.Label lblCheckDbResult;
     private System.Windows.Forms.Button btnListDbsWithTables;
+    private System.Windows.Forms.Label lblCheckTable;
+    private System.Windows.Forms.TextBox txtCheckTable;
+    private System.Windows.Forms.Button btnCheckTable;
+    private System.Windows.Forms.ListBox lstCheckTableResult;
 
 
     /// <summary>
@@ -172,7 +176,7 @@ partial class CosmosExplorerForm
         // Count db button
         this.btnCountDatabases = new Button();
         this.btnCountDatabases.Text = "Count Databases";
-        this.btnCountDatabases.Location = new System.Drawing.Point(540, 270); // next to listDb
+        this.btnCountDatabases.Location = new System.Drawing.Point(540, 270);
         this.btnCountDatabases.AutoSize = true;
         this.btnCountDatabases.Click += BtnCountDatabases_Click;
         this.tabDatabase.Controls.Add(this.btnCountDatabases);
@@ -180,7 +184,7 @@ partial class CosmosExplorerForm
         // Button: List DBs with table counts
         this.btnListDbsWithTables = new Button();
         this.btnListDbsWithTables.Text = "Count Tables per DB";
-        this.btnListDbsWithTables.Location = new System.Drawing.Point(540, 310); // slightly below Count Databases
+        this.btnListDbsWithTables.Location = new System.Drawing.Point(540, 310);
         this.btnListDbsWithTables.Size = new System.Drawing.Size(200, 35);
         this.btnListDbsWithTables.Click += BtnListDbsWithTableCount_Click;
         this.tabDatabase.Controls.Add(this.btnListDbsWithTables);
@@ -217,14 +221,14 @@ partial class CosmosExplorerForm
 
         // ComboBox: Filter results
         this.cmbFilteredDbs = new System.Windows.Forms.ComboBox();
-        this.cmbFilteredDbs.Location = new System.Drawing.Point(250, 530);   // aligned with textbox
+        this.cmbFilteredDbs.Location = new System.Drawing.Point(250, 530);
         this.cmbFilteredDbs.Width = 250;
         this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
 
         // Button: Count All Tables
         this.btnCountAllTables = new System.Windows.Forms.Button();
-        this.btnCountAllTables.Text = "Count All Tables in All DBs";
+        this.btnCountAllTables.Text = "Count All Tables in DBs";
         this.btnCountAllTables.Location = new System.Drawing.Point(20, 580);
         this.btnCountAllTables.Size = new System.Drawing.Size(200, 35);
         this.btnCountAllTables.Click += BtnCountAllTables_Click;
@@ -278,6 +282,7 @@ partial class CosmosExplorerForm
         // ========== CONTAINERS / TABLES TAB =========
         // ===========================================
 
+        
         // Select DB label
         this.lblSelectDbTables = new Label();
         this.lblSelectDbTables.Text = "Select Database:";
@@ -310,7 +315,7 @@ partial class CosmosExplorerForm
         // Label table count
         this.lblTableCount = new Label();
         this.lblTableCount.Text = "Tables: 0";
-        this.lblTableCount.Location = new System.Drawing.Point(20, 400);
+        this.lblTableCount.Location = new System.Drawing.Point(20, 370);
         this.lblTableCount.AutoSize = true;
         this.tabContainers.Controls.Add(this.lblTableCount);
 
@@ -342,6 +347,37 @@ partial class CosmosExplorerForm
         this.btnRefreshTables.Size = new System.Drawing.Size(180, 35);
         this.btnRefreshTables.Click += BtnRefreshTables_Click;
         this.tabContainers.Controls.Add(this.btnRefreshTables);
+
+        // ================================
+        // Check Table Existence in DBs
+        // ================================
+
+        // Label: Table Name
+        this.lblCheckTable = new Label();
+        this.lblCheckTable.Text = "Table Name to Check:";
+        this.lblCheckTable.AutoSize = true;
+        this.lblCheckTable.Location = new System.Drawing.Point(400, 200);
+        this.tabContainers.Controls.Add(this.lblCheckTable);
+
+        // TextBox: Table Name Input
+        this.txtCheckTable = new TextBox();
+        this.txtCheckTable.Location = new System.Drawing.Point(400, 225);
+        this.txtCheckTable.Width = 250;
+        this.tabContainers.Controls.Add(this.txtCheckTable);
+
+        // Button: Check Table
+        this.btnCheckTable = new Button();
+        this.btnCheckTable.Text = "Check Table";
+        this.btnCheckTable.Location = new System.Drawing.Point(660, 223);
+        this.btnCheckTable.Size = new System.Drawing.Size(120, 30);
+        this.btnCheckTable.Click += BtnCheckTable_Click;
+        this.tabContainers.Controls.Add(this.btnCheckTable);
+
+        // ListBox: Result DBs
+        this.lstCheckTableResult = new ListBox();
+        this.lstCheckTableResult.Location = new System.Drawing.Point(400, 265);
+        this.lstCheckTableResult.Size = new System.Drawing.Size(380, 150);
+        this.tabContainers.Controls.Add(this.lstCheckTableResult);
 
         #endregion
 

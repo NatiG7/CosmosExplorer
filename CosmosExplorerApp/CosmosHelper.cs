@@ -12,13 +12,11 @@ namespace cloudApp
         {
             cosmosClient = new CosmosClient(uri, key);
         }
-
         public CosmosClient GetClient()
 
         {
             return cosmosClient;
         }
-
         // --------------------------------------------------------------------
         // DB + Container Creation
         // --------------------------------------------------------------------
@@ -28,7 +26,6 @@ namespace cloudApp
             return (dbResponse.StatusCode == System.Net.HttpStatusCode.Created,
                     dbResponse.StatusCode.ToString());
         }
-
         public async Task<(bool created, string status)> CreateTableAsync(string db, string table)
         {
             Database dbObj = cosmosClient.GetDatabase(db);
@@ -38,7 +35,6 @@ namespace cloudApp
             return (cntrResponse.StatusCode == System.Net.HttpStatusCode.Created,
                     cntrResponse.StatusCode.ToString());
         }
-
         // --------------------------------------------------------------------
         // Get all DBs
         // --------------------------------------------------------------------
@@ -57,7 +53,6 @@ namespace cloudApp
 
             return dbNames;
         }
-
         // --------------------------------------------------------------------
         // Count all DBs
         // --------------------------------------------------------------------
@@ -73,7 +68,6 @@ namespace cloudApp
             }
             return numOfDbs;
         }
-
         // --------------------------------------------------------------------
         // Get all tables in all DBs
         // --------------------------------------------------------------------
@@ -98,7 +92,6 @@ namespace cloudApp
             }
             return tables;
         }
-
         // --------------------------------------------------------------------
         // Overload: tables in a specific DB
         // --------------------------------------------------------------------
@@ -114,7 +107,6 @@ namespace cloudApp
             }
             return tables;
         }
-
         // --------------------------------------------------------------------
         // DBs starting with prefix
         // --------------------------------------------------------------------
@@ -133,7 +125,6 @@ namespace cloudApp
             }
             return filteredDbs;
         }
-
         // --------------------------------------------------------------------
         // Tables with length filter
         // --------------------------------------------------------------------
@@ -161,7 +152,6 @@ namespace cloudApp
             }
             return result;
         }
-
         // --------------------------------------------------------------------
         // DBs containing a specific table
         // --------------------------------------------------------------------
@@ -194,7 +184,6 @@ namespace cloudApp
             }
             return result;
         }
-
         // --------------------------------------------------------------------
         // Count tables in each DB
         // --------------------------------------------------------------------
@@ -221,11 +210,9 @@ namespace cloudApp
             }
             return result;
         }
-
         // --------------------------------------------------------------------
         // Count tables in a DB
         // --------------------------------------------------------------------
-
         public async Task<int> CountTablesInDBAsync(string dbName)
         {
             int numOfTBs = 0;
@@ -239,7 +226,6 @@ namespace cloudApp
             }
             return numOfTBs;
         }
-
         public async Task<int> CountAllTablesAsync()
         {
             int tableCount = 0;
@@ -252,7 +238,6 @@ namespace cloudApp
             }
             return tableCount;
         }
-
         public async Task<bool> DatabaseExistsAsync(string dbName)
         {
             if (string.IsNullOrWhiteSpace(dbName))

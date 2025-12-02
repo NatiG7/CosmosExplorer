@@ -135,7 +135,7 @@ public partial class CosmosExplorerForm : Form
         if (!validateHelper())
             return;
 
-        var result = await helper.CreateDatabaseAsync(dbName);
+        (bool created, string status) result = await helper.CreateDatabaseAsync(dbName);
         MessageBox.Show(
             $"Database created? {result.created} (Status: {result.status})",
             "DB Creation",
@@ -276,7 +276,7 @@ public partial class CosmosExplorerForm : Form
             else
                 MessageBox.Show($"Table existed already. Status: {status}", "Info",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+            txtContainerName.Clear();
             BtnRefreshTables_Click(this, EventArgs.Empty);
         }
         catch (Exception ex)
@@ -287,14 +287,22 @@ public partial class CosmosExplorerForm : Form
     }
     private async void BtnListDbsWithTableCount_Click(object sender, EventArgs e)
     {
-        if (!validateHelper())
-            return;
-        listDb.Items.Clear();
-        List<string> dbs = await helper.GetDatabasesAsync();
-        foreach (string db in dbs)
+        try
         {
-            int tableCount = await helper.CountTablesInDBAsync(db);
-            listDb.Items.Add($"{db} - Tables: {tableCount}");
+            if (!validateHelper())
+                return;
+            listDb.Items.Clear();
+            List<string> dbs = await helper.GetDatabasesAsync();
+            foreach (string db in dbs)
+            {
+                int tableCount = await helper.CountTablesInDBAsync(db);
+                listDb.Items.Add($"{db} - Tables: {tableCount}");
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error listing DBs with table counts: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
     private async void BtnCheckDbExists_Click(object sender, EventArgs e)
@@ -315,6 +323,40 @@ public partial class CosmosExplorerForm : Form
         else
             MessageBox.Show($"Database '{dbName}' does not exist.", "Info",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
+    private async void BtnCheckTable_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!validateHelper()) return;
+            string tableName = txtCheckTable.Text.Trim();
+            if (string.IsNullOrEmpty(tableName))
+            {
+                MessageBox.Show("Please enter a table name to check.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            lstCheckTableResult.Items.Clear();
+            List<string> DbsWithTableName = await helper.GetDBsContainingTableAsync(tableName);
+            if (DbsWithTableName.Count > 0)
+            {
+                lstCheckTableResult.Items.Add("Table found in DB: ");
+                foreach (string db in DbsWithTableName)
+                {
+                    lstCheckTableResult.Items.Add(db);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Table '{tableName}' not found in any database.", "Info",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error checking table existence: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
     private async Task LoadDatabasesIntoComboBox()
     {
@@ -351,4 +393,5 @@ public partial class CosmosExplorerForm : Form
         foreach (string table in tables)
             listTables.Items.Add(table);
     }
+
 }
