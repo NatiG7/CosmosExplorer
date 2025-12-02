@@ -37,6 +37,8 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnFilterDb;
     private System.Windows.Forms.Label lblFilterResults;
     private System.Windows.Forms.ComboBox cmbFilteredDbs;
+    private System.Windows.Forms.Button btnCountAllTables;
+    private System.Windows.Forms.Label lblTotalTables;
 
 
     /// <summary>
@@ -206,6 +208,21 @@ partial class CosmosExplorerForm
         this.cmbFilteredDbs.Width = 250;
         this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
+
+        // Button: Count All Tables
+        this.btnCountAllTables = new System.Windows.Forms.Button();
+        this.btnCountAllTables.Text = "Count All Tables in All DBs";
+        this.btnCountAllTables.Location = new System.Drawing.Point(20, 580);
+        this.btnCountAllTables.Size = new System.Drawing.Size(200, 35);
+        this.btnCountAllTables.Click += BtnCountAllTables_Click;
+        this.tabDatabase.Controls.Add(this.btnCountAllTables);
+
+        // Label: Total Tables Result
+        this.lblTotalTables = new System.Windows.Forms.Label();
+        this.lblTotalTables.Text = "Total tables in all DBs: ";
+        this.lblTotalTables.AutoSize = true;
+        this.lblTotalTables.Location = new System.Drawing.Point(250, 590);
+        this.tabDatabase.Controls.Add(this.lblTotalTables);
 
         #endregion
 

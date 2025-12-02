@@ -14,6 +14,7 @@ namespace cloudApp
         }
 
         public CosmosClient GetClient()
+
         {
             return cosmosClient;
         }
@@ -221,6 +222,36 @@ namespace cloudApp
             return result;
         }
 
+        // --------------------------------------------------------------------
+        // Count tables in a DB
+        // --------------------------------------------------------------------
+
+        public async Task<int> CountTablesInDBAsync(string dbName)
+        {
+            int numOfTBs = 0;
+            Database dbObj = cosmosClient.GetDatabase(dbName);
+            FeedIterator<ContainerProperties> tableIterator =
+                dbObj.GetContainerQueryIterator<ContainerProperties>();
+            while (tableIterator.HasMoreResults)
+            {
+                foreach (ContainerProperties currentTBprop in await tableIterator.ReadNextAsync())
+                    numOfTBs++;
+            }
+            return numOfTBs;
+        }
+
+        public async Task<int> CountAllTablesAsync()
+        {
+            int tableCount = 0;
+
+            List<string> DBs = await GetDatabasesAsync();
+            foreach (string dbName in DBs)
+            {
+                int countInDb = await CountTablesInDBAsync(dbName);
+                tableCount += countInDb;
+            }
+            return tableCount;
+        }
         // --------------------------------------------------------------------
         // Exact table count filter
         // --------------------------------------------------------------------
