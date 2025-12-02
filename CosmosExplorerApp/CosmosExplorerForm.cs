@@ -393,6 +393,47 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    private async void BtnExactTableCount_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!validateHelper()) return;
+            cmbExactTableCountResult.Items.Clear();
+            if (listDb.Items.Count == 0)
+            {
+                MessageBox.Show("No databases available to check table counts.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (!int.TryParse(txtExactTableCount.Text.Trim(), out int userTableCount))
+            {
+                MessageBox.Show("Please enter a valid integer for table count.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            List<string> matchingDbs = [];
+            foreach (var dbItem in listDb.Items)
+            {
+                string? dbName = dbItem.ToString() ?? string.Empty;
+                int tableCount = await helper.CountTablesInDBAsync(dbName);
+
+                if (tableCount == userTableCount)
+                {
+                    matchingDbs.Add(dbName);
+                }
+            }
+            string resultString = matchingDbs.Count > 0
+                ? string.Join(", ", matchingDbs)
+                : "No databases found with the exact table count.";
+            cmbExactTableCountResult.Items.Add(resultString);
+            cmbExactTableCountResult.SelectedIndex = 0;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error finding DBs with exact table count: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())
