@@ -39,6 +39,10 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.ComboBox cmbFilteredDbs;
     private System.Windows.Forms.Button btnCountAllTables;
     private System.Windows.Forms.Label lblTotalTables;
+    private System.Windows.Forms.Label lblCheckDb;
+    private System.Windows.Forms.TextBox txtCheckDb;
+    private System.Windows.Forms.Button btnCheckDb;
+    private System.Windows.Forms.Label lblCheckDbResult;
 
 
     /// <summary>
@@ -223,6 +227,38 @@ partial class CosmosExplorerForm
         this.lblTotalTables.AutoSize = true;
         this.lblTotalTables.Location = new System.Drawing.Point(250, 590);
         this.tabDatabase.Controls.Add(this.lblTotalTables);
+
+        #region Find Database UI
+
+        // Label
+        this.lblCheckDb = new System.Windows.Forms.Label();
+        this.lblCheckDb.Text = "Check if DB Exists:";
+        this.lblCheckDb.AutoSize = true;
+        this.lblCheckDb.Location = new System.Drawing.Point(20, 660);
+        this.tabDatabase.Controls.Add(this.lblCheckDb);
+
+        // TextBox
+        this.txtCheckDb = new System.Windows.Forms.TextBox();
+        this.txtCheckDb.Location = new System.Drawing.Point(200, 655);
+        this.txtCheckDb.Width = 200;
+        this.tabDatabase.Controls.Add(this.txtCheckDb);
+
+        // Button
+        this.btnCheckDb = new System.Windows.Forms.Button();
+        this.btnCheckDb.Text = "Check";
+        this.btnCheckDb.Location = new System.Drawing.Point(420, 652);
+        this.btnCheckDb.Size = new System.Drawing.Size(100, 30);
+        this.btnCheckDb.Click += BtnCheckDbExists_Click;
+        this.tabDatabase.Controls.Add(this.btnCheckDb);
+
+        // Result Label
+        this.lblCheckDbResult = new System.Windows.Forms.Label();
+        this.lblCheckDbResult.AutoSize = true;
+        this.lblCheckDbResult.Location = new System.Drawing.Point(20, 700);
+        this.lblCheckDbResult.Text = "";
+        this.tabDatabase.Controls.Add(this.lblCheckDbResult);
+
+        #endregion
 
         #endregion
 

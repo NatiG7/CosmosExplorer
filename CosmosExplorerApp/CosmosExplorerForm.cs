@@ -304,6 +304,25 @@ public partial class CosmosExplorerForm : Form
         }
     }
 
+    private async void BtnCheckDbExists_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper())
+            return;
+        string dbName = txtCheckDb.Text.Trim();
+        if (string.IsNullOrEmpty(dbName))
+        {
+            MessageBox.Show("Please enter a database name to check.",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        bool dbExists = await helper.DatabaseExistsAsync(dbName);
+        if (dbExists)
+            MessageBox.Show($"Database '{dbName}' exists.", "Info",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        else
+            MessageBox.Show($"Database '{dbName}' does not exist.", "Info",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+    }
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())

@@ -252,6 +252,16 @@ namespace cloudApp
             }
             return tableCount;
         }
+
+        public async Task<bool> DatabaseExistsAsync(string dbName)
+        {
+            if (string.IsNullOrWhiteSpace(dbName))
+                return false;
+
+            List<string> allDbs = await GetDatabasesAsync();
+
+            return allDbs.Contains(dbName, StringComparer.OrdinalIgnoreCase);
+        }
         // --------------------------------------------------------------------
         // Exact table count filter
         // --------------------------------------------------------------------
