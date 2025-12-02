@@ -434,6 +434,19 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    private async void BtnMinTableName_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!validateHelper()) return;
+            cmbMinLegthTables.Items.Clear();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error finding tables with minimum name length: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())

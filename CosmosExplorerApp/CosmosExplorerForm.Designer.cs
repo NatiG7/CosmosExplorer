@@ -55,6 +55,10 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtExactTableCount;
     private System.Windows.Forms.Button btnExactTableCount;
     private System.Windows.Forms.ComboBox cmbExactTableCountResult;
+    private System.Windows.Forms.Label lblMinTableLength;
+    private System.Windows.Forms.TextBox txtMinTableLengthInput;
+    private System.Windows.Forms.Button btnMinTableName;
+    private System.Windows.Forms.ComboBox cmbMinLegthTables;
 
 
     /// <summary>
@@ -436,6 +440,34 @@ partial class CosmosExplorerForm
         this.lstCheckTableResult.Location = new System.Drawing.Point(400, 265);
         this.lstCheckTableResult.Size = new System.Drawing.Size(380, 150);
         this.tabContainers.Controls.Add(this.lstCheckTableResult);
+
+        // Label: Enter table name length
+        this.lblMinTableLength = new Label();
+        this.lblMinTableLength.Text = "Table Name Min Length:";
+        this.lblMinTableLength.Location = new System.Drawing.Point(20, 170);
+        this.lblMinTableLength.AutoSize = true;
+        this.tabContainers.Controls.Add(this.lblMinTableLength);
+
+        // TextBox: User input for table length
+        this.txtMinTableLengthInput = new TextBox();
+        this.txtMinTableLengthInput.Location = new System.Drawing.Point(220, 170);
+        this.txtMinTableLengthInput.Width = 100;
+        this.tabContainers.Controls.Add(this.txtMinTableLengthInput);
+
+        // Button: Show tables names longer than input length
+        this.btnMinTableName = new Button();
+        this.btnMinTableName.Text = "ShowTables";
+        this.btnMinTableName.Location = new System.Drawing.Point(330, 170);
+        this.btnMinTableName.AutoSize = true;
+        this.btnMinTableName.Click += BtnMinTableName_Click;
+        this.tabContainers.Controls.Add(this.btnMinTableName);
+
+        // ComboBox: Display result
+        this.cmbMinLegthTables = new ComboBox();
+        this.cmbMinLegthTables.Location = new System.Drawing.Point(20, 210);
+        this.cmbMinLegthTables.Width = comboDbTables.Width;
+        this.cmbMinLegthTables.DropDownStyle = ComboBoxStyle.DropDownList;
+        this.tabContainers.Controls.Add(this.cmbMinLegthTables);
 
         #endregion
 
