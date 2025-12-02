@@ -4,18 +4,15 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using cloudApp;
-using System.Data.Common;
 
 public partial class CosmosExplorerForm : Form
 {
     private CosmosHelper helper;
     private CosmosClient? _client;
-
     public CosmosExplorerForm()
     {
         InitializeComponent();
     }
-
     private bool validateHelper()
     {
         // Validate helper
@@ -28,7 +25,6 @@ public partial class CosmosExplorerForm : Form
         }
         return true;
     }
-
     // ----------------------------------------------------------
     // Refresh DB list
     // ----------------------------------------------------------
@@ -82,7 +78,6 @@ public partial class CosmosExplorerForm : Form
                 MessageBoxIcon.Error);
         }
     }
-
     private async Task<double> MeasureConnectionSpeedAsync()
     {
         if (helper == null) return -1;
@@ -100,7 +95,6 @@ public partial class CosmosExplorerForm : Form
         sw.Stop();
         return sw.Elapsed.TotalMilliseconds; // return milliseconds
     }
-
     // ----------------------------------------------------------
     // Load keys from App.config
     // ----------------------------------------------------------
@@ -122,7 +116,6 @@ public partial class CosmosExplorerForm : Form
         await RefreshDatabasesAsync();
         await LoadDatabasesIntoComboBox();
     }
-
     // ----------------------------------------------------------
     // Create Database
     // ----------------------------------------------------------
@@ -131,7 +124,6 @@ public partial class CosmosExplorerForm : Form
         string endpoint = endpointTxtBox.Text.Trim();
         string key = pkeyTxtBox.Text.Trim();
         string dbName = dbNameTxtBox.Text.Trim();
-
         if (string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(key))
         {
             MessageBox.Show("Endpoint or PKey is empty!",
@@ -140,12 +132,8 @@ public partial class CosmosExplorerForm : Form
                             MessageBoxIcon.Error);
             return;
         }
-
-        if (helper == null)
-        {
-            helper = new CosmosHelper(endpoint, key);
-            _client = helper.GetClient();
-        }
+        if (!validateHelper())
+            return;
 
         var result = await helper.CreateDatabaseAsync(dbName);
         MessageBox.Show(
@@ -156,8 +144,8 @@ public partial class CosmosExplorerForm : Form
         );
 
         await RefreshDatabasesAsync();
+        await LoadDatabasesIntoComboBox();
     }
-
     private async void BtnCountDatabases_Click(object sender, EventArgs e)
     {
         try
@@ -174,7 +162,6 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-
     private async Task<int> CountTablesPerDB(object sender, EventArgs e)
     {
         if (!validateHelper())
@@ -188,7 +175,6 @@ public partial class CosmosExplorerForm : Form
         }
         return countTables;
     }
-
     private async void BtnFilterDb_Click(object sender, EventArgs e)
     {
         if (!validateHelper())
@@ -211,8 +197,6 @@ public partial class CosmosExplorerForm : Form
             MessageBox.Show("No databases found with that prefix.", "Info",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
-
-
     private async void BtnRefreshTables_Click(object sender, EventArgs e)
     {
         try
@@ -243,7 +227,6 @@ public partial class CosmosExplorerForm : Form
                 MessageBoxIcon.Error);
         }
     }
-
     private async void BtnCountAllTables_Click(object sender, EventArgs e)
     {
         if (!validateHelper())
@@ -266,7 +249,6 @@ public partial class CosmosExplorerForm : Form
             btnCountAllTables.Text = "Count All Tables in All DBs";
         }
     }
-
     private async void BtnCreateContainer_Click(object sender, EventArgs e)
     {
         try
@@ -303,7 +285,18 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-
+    private async void BtnListDbsWithTableCount_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper())
+            return;
+        listDb.Items.Clear();
+        List<string> dbs = await helper.GetDatabasesAsync();
+        foreach (string db in dbs)
+        {
+            int tableCount = await helper.CountTablesInDBAsync(db);
+            listDb.Items.Add($"{db} - Tables: {tableCount}");
+        }
+    }
     private async void BtnCheckDbExists_Click(object sender, EventArgs e)
     {
         if (!validateHelper())

@@ -43,6 +43,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtCheckDb;
     private System.Windows.Forms.Button btnCheckDb;
     private System.Windows.Forms.Label lblCheckDbResult;
+    private System.Windows.Forms.Button btnListDbsWithTables;
 
 
     /// <summary>
@@ -175,6 +176,14 @@ partial class CosmosExplorerForm
         this.btnCountDatabases.AutoSize = true;
         this.btnCountDatabases.Click += BtnCountDatabases_Click;
         this.tabDatabase.Controls.Add(this.btnCountDatabases);
+
+        // Button: List DBs with table counts
+        this.btnListDbsWithTables = new Button();
+        this.btnListDbsWithTables.Text = "Count Tables per DB";
+        this.btnListDbsWithTables.Location = new System.Drawing.Point(540, 310); // slightly below Count Databases
+        this.btnListDbsWithTables.Size = new System.Drawing.Size(200, 35);
+        this.btnListDbsWithTables.Click += BtnListDbsWithTableCount_Click;
+        this.tabDatabase.Controls.Add(this.btnListDbsWithTables);
 
         #region Database Filter UI
 
