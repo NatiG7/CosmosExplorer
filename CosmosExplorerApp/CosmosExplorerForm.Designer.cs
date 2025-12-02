@@ -25,7 +25,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Label lblSelectDbTables;
     private System.Windows.Forms.ComboBox comboDbTables;
     private System.Windows.Forms.Label lblTablesList;
-    private System.Windows.Forms.ListBox listTables;
+    private System.Windows.Forms.ComboBox listTables;
     private System.Windows.Forms.Label lblContainerName;
     private System.Windows.Forms.TextBox txtContainerName;
     private System.Windows.Forms.Button btnCreateContainer;
@@ -48,6 +48,9 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtCheckTable;
     private System.Windows.Forms.Button btnCheckTable;
     private System.Windows.Forms.ListBox lstCheckTableResult;
+    private System.Windows.Forms.Label lblDbConditionDesc;
+    private System.Windows.Forms.Button btnApplyConditionFilter;
+    private System.Windows.Forms.ComboBox cmbConditionResults;
 
 
     /// <summary>
@@ -194,20 +197,20 @@ partial class CosmosExplorerForm
         // Label: Filter DBs
         this.lblFilterDb = new System.Windows.Forms.Label();
         this.lblFilterDb.Text = "Filter DBs starting with:";
-        this.lblFilterDb.Location = new System.Drawing.Point(20, 485);
+        this.lblFilterDb.Location = new System.Drawing.Point(20, 465);
         this.lblFilterDb.AutoSize = true;
         this.tabDatabase.Controls.Add(this.lblFilterDb);
 
         // TextBox: Filter prefix
         this.txtDbPrefix = new System.Windows.Forms.TextBox();
-        this.txtDbPrefix.Location = new System.Drawing.Point(210, 480);
+        this.txtDbPrefix.Location = new System.Drawing.Point(210, 460);
         this.txtDbPrefix.Width = 200;
         this.tabDatabase.Controls.Add(this.txtDbPrefix);
 
         // Button: Filter DBs
         this.btnFilterDb = new System.Windows.Forms.Button();
         this.btnFilterDb.Text = "Filter";
-        this.btnFilterDb.Location = new System.Drawing.Point(430, 478);
+        this.btnFilterDb.Location = new System.Drawing.Point(420, 458);
         this.btnFilterDb.Size = new System.Drawing.Size(100, 30);
         this.btnFilterDb.Click += BtnFilterDb_Click;
         this.tabDatabase.Controls.Add(this.btnFilterDb);
@@ -216,20 +219,42 @@ partial class CosmosExplorerForm
         this.lblFilterResults = new System.Windows.Forms.Label();
         this.lblFilterResults.Text = "Filtered Databases:";
         this.lblFilterResults.AutoSize = true;
-        this.lblFilterResults.Location = new System.Drawing.Point(20, 535);
+        this.lblFilterResults.Location = new System.Drawing.Point(20, 505);
         this.tabDatabase.Controls.Add(this.lblFilterResults);
 
         // ComboBox: Filter results
         this.cmbFilteredDbs = new System.Windows.Forms.ComboBox();
-        this.cmbFilteredDbs.Location = new System.Drawing.Point(250, 530);
+        this.cmbFilteredDbs.Location = new System.Drawing.Point(270, 500);
         this.cmbFilteredDbs.Width = 250;
         this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
 
+        // Label: Describe DB filter condition
+        this.lblDbConditionDesc = new Label();
+        this.lblDbConditionDesc.Text = "Condition: Odd-length names with >=3 tables or 0 tables";
+        this.lblDbConditionDesc.AutoSize = true;
+        this.lblDbConditionDesc.Location = new System.Drawing.Point(20, 540);
+        this.tabDatabase.Controls.Add(this.lblDbConditionDesc);
+
+        // Button: Apply condition filter
+        this.btnApplyConditionFilter = new Button();
+        this.btnApplyConditionFilter.Text = "Show Condition Result";
+        this.btnApplyConditionFilter.Location = new System.Drawing.Point(540, 540);
+        this.btnApplyConditionFilter.AutoSize = true;
+        this.btnApplyConditionFilter.Click += BtnApplyDbCondition_Click;
+        this.tabDatabase.Controls.Add(this.btnApplyConditionFilter);
+
+        // ComboBox: Display condition results
+        this.cmbConditionResults = new ComboBox();
+        this.cmbConditionResults.Location = new System.Drawing.Point(20, 565);
+        this.cmbConditionResults.Width = lblDbConditionDesc.Width;
+        this.cmbConditionResults.DropDownStyle = ComboBoxStyle.DropDownList;
+        this.tabDatabase.Controls.Add(this.cmbConditionResults);
+
         // Button: Count All Tables
         this.btnCountAllTables = new System.Windows.Forms.Button();
         this.btnCountAllTables.Text = "Count All Tables in DBs";
-        this.btnCountAllTables.Location = new System.Drawing.Point(20, 580);
+        this.btnCountAllTables.Location = new System.Drawing.Point(20, 610);
         this.btnCountAllTables.Size = new System.Drawing.Size(200, 35);
         this.btnCountAllTables.Click += BtnCountAllTables_Click;
         this.tabDatabase.Controls.Add(this.btnCountAllTables);
@@ -238,7 +263,7 @@ partial class CosmosExplorerForm
         this.lblTotalTables = new System.Windows.Forms.Label();
         this.lblTotalTables.Text = "Total tables in all DBs: ";
         this.lblTotalTables.AutoSize = true;
-        this.lblTotalTables.Location = new System.Drawing.Point(250, 590);
+        this.lblTotalTables.Location = new System.Drawing.Point(250, 610);
         this.tabDatabase.Controls.Add(this.lblTotalTables);
 
         #region Find Database UI
@@ -279,10 +304,10 @@ partial class CosmosExplorerForm
 
         #region ContainersTab
         // ===========================================
-        // ========== CONTAINERS / TABLES TAB =========
+        // ========== CONTAINERS / TABLES TAB ========
         // ===========================================
 
-        
+
         // Select DB label
         this.lblSelectDbTables = new Label();
         this.lblSelectDbTables.Text = "Select Database:";
@@ -306,16 +331,17 @@ partial class CosmosExplorerForm
         this.tabContainers.Controls.Add(this.lblTablesList);
 
 
-        // Tables listbox
-        this.listTables = new ListBox();
+        // Tables comboBox
+        this.listTables = new ComboBox();
         this.listTables.Location = new System.Drawing.Point(20, 115);
-        this.listTables.Size = new System.Drawing.Size(350, 250);
+        this.listTables.Width = 300;
+        this.listTables.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabContainers.Controls.Add(this.listTables);
 
         // Label table count
         this.lblTableCount = new Label();
         this.lblTableCount.Text = "Tables: 0";
-        this.lblTableCount.Location = new System.Drawing.Point(20, 370);
+        this.lblTableCount.Location = new System.Drawing.Point(20, 150);
         this.lblTableCount.AutoSize = true;
         this.tabContainers.Controls.Add(this.lblTableCount);
 

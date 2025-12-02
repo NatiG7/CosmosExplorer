@@ -190,7 +190,7 @@ public partial class CosmosExplorerForm : Form
         cmbFilteredDbs.Items.Clear();
         foreach (string db in filteredDbs)
             cmbFilteredDbs.Items.Add(db);
-        // ➜ Auto-select first item
+        // Auto-select first item
         if (cmbFilteredDbs.Items.Count > 0)
             cmbFilteredDbs.SelectedIndex = 0;
         else
@@ -215,6 +215,8 @@ public partial class CosmosExplorerForm : Form
             listTables.Items.Clear();
             List<string> tables = await helper.GetTablesAsync(selectedDb);
             foreach (string table in tables) listTables.Items.Add(table);
+            if (listTables.Items.Count > 0)
+                listTables.SelectedIndex = 0;
 
             lblTableCount.Text = $"Tables/Containers: {tables.Count}";
         }
@@ -358,21 +360,57 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    private async void BtnApplyDbCondition_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (!validateHelper()) return;
+            cmbConditionResults.Items.Clear();
+            if (listDb.Items.Count == 0)
+            {
+                MessageBox.Show("No databases available to apply condition.",
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            foreach (var dbItem in listDb.Items)
+            {
+                string dbName = dbItem.ToString() ?? string.Empty;
+                int tableCount = await helper.CountTablesInDBAsync(dbName);
+
+                if (!(dbName.Length % 2 == 0) && (tableCount >= 3 || tableCount == 0))
+                {
+                    cmbConditionResults.Items.Add($"{dbName} - Tables: {tableCount}");
+                }
+            }
+            if (cmbConditionResults.Items.Count > 0)
+                cmbConditionResults.SelectedIndex = 0;
+            else
+                cmbConditionResults.Items.Add("No databases matched the condition.");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error applying DB condition: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())
             return;
-        // call the helper method to get the list of databases
         List<string> dbs = await helper.GetDatabasesAsync();
         comboDbTables.Items.Clear();
         foreach (string db in dbs)
-        // iterate through the list and add each database to the combo box
-        {
             comboDbTables.Items.Add(db);
-        }
+
         if (comboDbTables.Items.Count > 0)
         {
-            comboDbTables.SelectedIndex = 0; // Select the first item by default
+            comboDbTables.SelectedIndex = 0;   // select first DB safely
+
+            string? selectedDb = comboDbTables.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(selectedDb))
+            {
+                await RefreshTablesList(selectedDb);
+            }
         }
     }
     private async void ComboDbTables_SelectedIndexChanged(object sender, EventArgs e)
@@ -386,12 +424,19 @@ public partial class CosmosExplorerForm : Form
     {
         if (helper == null || string.IsNullOrEmpty(dbName))
             return;
-
         List<string> tables = await helper.GetTablesAsync(dbName);
-
         listTables.Items.Clear();
         foreach (string table in tables)
             listTables.Items.Add(table);
+        if (listTables.Items.Count > 0)
+            listTables.SelectedIndex = 0;
+        await UpdateTableCountAsync(dbName);
+    }
+
+    private async Task UpdateTableCountAsync(string dbName)
+    {
+        int count = await helper.CountTablesInDBAsync(dbName);
+        lblTableCount.Text = $"Tables / Containers: {count}";
     }
 
 }
