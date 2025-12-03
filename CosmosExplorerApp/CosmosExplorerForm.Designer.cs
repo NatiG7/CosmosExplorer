@@ -444,27 +444,27 @@ partial class CosmosExplorerForm
         // Label: Enter table name length
         this.lblMinTableLength = new Label();
         this.lblMinTableLength.Text = "Table Name Min Length:";
-        this.lblMinTableLength.Location = new System.Drawing.Point(20, 170);
+        this.lblMinTableLength.Location = new System.Drawing.Point(20, 180);
         this.lblMinTableLength.AutoSize = true;
         this.tabContainers.Controls.Add(this.lblMinTableLength);
 
         // TextBox: User input for table length
         this.txtMinTableLengthInput = new TextBox();
-        this.txtMinTableLengthInput.Location = new System.Drawing.Point(220, 170);
+        this.txtMinTableLengthInput.Location = new System.Drawing.Point(220, 175);
         this.txtMinTableLengthInput.Width = 100;
         this.tabContainers.Controls.Add(this.txtMinTableLengthInput);
 
         // Button: Show tables names longer than input length
         this.btnMinTableName = new Button();
-        this.btnMinTableName.Text = "ShowTables";
-        this.btnMinTableName.Location = new System.Drawing.Point(330, 170);
+        this.btnMinTableName.Text = "Filter Table names (non-inclusive)";
+        this.btnMinTableName.Location = new System.Drawing.Point(20, 210);
         this.btnMinTableName.AutoSize = true;
         this.btnMinTableName.Click += BtnMinTableName_Click;
         this.tabContainers.Controls.Add(this.btnMinTableName);
 
         // ComboBox: Display result
         this.cmbMinLegthTables = new ComboBox();
-        this.cmbMinLegthTables.Location = new System.Drawing.Point(20, 210);
+        this.cmbMinLegthTables.Location = new System.Drawing.Point(20, 250);
         this.cmbMinLegthTables.Width = comboDbTables.Width;
         this.cmbMinLegthTables.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabContainers.Controls.Add(this.cmbMinLegthTables);

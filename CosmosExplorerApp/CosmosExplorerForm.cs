@@ -440,6 +440,28 @@ public partial class CosmosExplorerForm : Form
         {
             if (!validateHelper()) return;
             cmbMinLegthTables.Items.Clear();
+            int minLength = int.Parse(txtMinTableLengthInput.Text.Trim());
+            List<string> dbs = await helper.GetDatabasesAsync();
+            foreach (string db in dbs)
+            {
+                List<string> dbTables = await helper.GetTablesAsync(db);
+                foreach (string table in dbTables)
+                {
+                    if (table.Length > minLength)
+                    {
+                        cmbMinLegthTables.Items.Add($"{db} : {table}");
+                    }
+                }
+            }
+            if (cmbMinLegthTables.Items.Count > 0)
+            {
+                cmbMinLegthTables.SelectedIndex = 0;
+            }
+            else
+            {
+                MessageBox.Show("No tables found with name length greater than specified minimum.",
+                    "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
         catch (Exception ex)
         {
