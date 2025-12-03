@@ -98,12 +98,19 @@ namespace cloudApp
         public async Task<List<string>> GetTablesAsync(string dbName)
         {
             List<string> tables = new List<string>();
-            Database dbObj = cosmosClient.GetDatabase(dbName);
-            FeedIterator<ContainerProperties> tableIterator = dbObj.GetContainerQueryIterator<ContainerProperties>();
-            while (tableIterator.HasMoreResults)
+            try
             {
-                foreach (ContainerProperties currentTable in await tableIterator.ReadNextAsync())
-                    tables.Add(currentTable.Id);
+                Database dbObj = cosmosClient.GetDatabase(dbName);
+                FeedIterator<ContainerProperties> tableIterator = dbObj.GetContainerQueryIterator<ContainerProperties>();
+                while (tableIterator.HasMoreResults)
+                {
+                    foreach (ContainerProperties currentTable in await tableIterator.ReadNextAsync())
+                        tables.Add(currentTable.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error accessing database '{dbName}': {ex.Message}", ex);
             }
             return tables;
         }
@@ -311,6 +318,32 @@ namespace cloudApp
                 .Where(db => db.Length == maxLen)
                 .ToList();
             return string.Join(", ", longestNames);
+        }
+        public async Task<string> GetDbsWithMostTablesAsync()
+        {
+            List<string> allDbs = await GetDatabasesAsync();
+
+            if (allDbs.Count == 0)
+                return "No database exists in the current cloud account";
+            List<string> resultDbs = new List<string>();
+            int maxCount = 0;
+            bool hasTables = false;
+            foreach (string db in allDbs)
+            {
+                int count = await CountTablesInDBAsync(db);
+                if (count > 0) hasTables = true;
+                if (count > maxCount)
+                {
+                    maxCount = count;
+                    resultDbs.Clear();
+                    resultDbs.Add(db);
+                }
+                else if (count == maxCount && count > 0) resultDbs.Add(db);
+            }
+            if (!hasTables)
+                return "There are no tables in any of the databases.";
+
+            return string.Join(", ", resultDbs);
         }
     }
 }

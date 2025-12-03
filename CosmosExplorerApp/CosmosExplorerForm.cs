@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using cloudApp;
+using Microsoft.Azure.Cosmos.Serialization.HybridRow;
 
 public partial class CosmosExplorerForm : Form
 {
@@ -509,6 +510,39 @@ public partial class CosmosExplorerForm : Form
         catch (Exception ex)
         {
             MessageBox.Show($"Error finding tables with minimum name length: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+    private async void BtnMostTables_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        cmbFilteredDbs.Items.Clear();
+
+        try
+        {
+            string DbsWithMostTables = await helper.GetDbsWithMostTablesAsync();
+            string resultMsg;
+            if (DbsWithMostTables == "No database exists in the current cloud account"
+                || DbsWithMostTables == "There are no tables in any of the databases")
+                cmbFilteredDbs.Items.Add(DbsWithMostTables);
+            else
+            {
+                List<string> dbList = DbsWithMostTables
+                    .Split([", "], StringSplitOptions.RemoveEmptyEntries)
+                    .ToList();
+                // check count for first item because all items have same table count
+                int tableCount = await helper.CountTablesInDBAsync(dbList[0]);
+                resultMsg = $"The databases have {tableCount} TBs:";
+                cmbFilteredDbs.Items.Add(resultMsg);
+                foreach (string db in dbList)
+                    cmbFilteredDbs.Items.Add(db);
+            }
+            if (cmbFilteredDbs.Items.Count > 0)
+                cmbFilteredDbs.SelectedIndex = 0;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error finding DB(s) with most tables: {ex.Message}",
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }

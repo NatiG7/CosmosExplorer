@@ -62,6 +62,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.CheckBox chkDbNameOnly;
     private System.Windows.Forms.CheckBox chkMatchTables;
     private System.Windows.Forms.CheckBox chkLongestNames;
+    private System.Windows.Forms.Button btnMostTables;
 
 
     /// <summary>
@@ -122,33 +123,33 @@ partial class CosmosExplorerForm
         // Endpoint label
         this.lblEndpoint = new Label();
         this.lblEndpoint.Text = "Endpoint URI:";
-        this.lblEndpoint.Location = new System.Drawing.Point(20, 15);
+        this.lblEndpoint.Location = new System.Drawing.Point(20, 5);
         this.lblEndpoint.AutoSize = true;
         this.tabDatabase.Controls.Add(lblEndpoint);
 
         // Endpoint textbox
         this.endpointTxtBox = new TextBox();
-        this.endpointTxtBox.Location = new System.Drawing.Point(20, 40);
+        this.endpointTxtBox.Location = new System.Drawing.Point(20, 30);
         this.endpointTxtBox.Width = 500;
         this.tabDatabase.Controls.Add(endpointTxtBox);
 
         // Primary Key label
         this.lblPkey = new Label();
         this.lblPkey.Text = "Primary Key:";
-        this.lblPkey.Location = new System.Drawing.Point(20, 75);
+        this.lblPkey.Location = new System.Drawing.Point(20, 65);
         this.lblPkey.AutoSize = true;
         this.tabDatabase.Controls.Add(lblPkey);
 
         // Primary key textbox
         this.pkeyTxtBox = new TextBox();
-        this.pkeyTxtBox.Location = new System.Drawing.Point(20, 100);
+        this.pkeyTxtBox.Location = new System.Drawing.Point(20, 90);
         this.pkeyTxtBox.Width = 500;
         this.tabDatabase.Controls.Add(pkeyTxtBox);
 
         // Load keys button
         this.btnLoadKeys = new Button();
         this.btnLoadKeys.Text = "Load Keys";
-        this.btnLoadKeys.Location = new System.Drawing.Point(525, 100);
+        this.btnLoadKeys.Location = new System.Drawing.Point(525, 90);
         this.btnLoadKeys.Size = new System.Drawing.Size(120, 35);
         this.btnLoadKeys.Click += BtnLoadKeys_Click;
         this.tabDatabase.Controls.Add(btnLoadKeys);
@@ -156,20 +157,20 @@ partial class CosmosExplorerForm
         // Database name label
         this.lblDbName = new Label();
         this.lblDbName.Text = "Database Name:";
-        this.lblDbName.Location = new System.Drawing.Point(20, 150);
+        this.lblDbName.Location = new System.Drawing.Point(20, 130);
         this.lblDbName.AutoSize = true;
         this.tabDatabase.Controls.Add(this.lblDbName);
 
         // DB name textbox
         this.dbNameTxtBox = new TextBox();
-        this.dbNameTxtBox.Location = new System.Drawing.Point(20, 175);
+        this.dbNameTxtBox.Location = new System.Drawing.Point(20, 155);
         this.dbNameTxtBox.Width = 500;
         this.tabDatabase.Controls.Add(this.dbNameTxtBox);
 
         // Create DB button
         this.btnCreateDb = new Button();
         this.btnCreateDb.Text = "Create Database";
-        this.btnCreateDb.Location = new System.Drawing.Point(525, 175);
+        this.btnCreateDb.Location = new System.Drawing.Point(525, 155);
         this.btnCreateDb.Size = new System.Drawing.Size(200, 35);
         this.btnCreateDb.Click += BtnCreateDb_Click;
         this.tabDatabase.Controls.Add(btnCreateDb);
@@ -177,20 +178,20 @@ partial class CosmosExplorerForm
         // Label for DB list
         this.lblListDb = new Label();
         this.lblListDb.Text = "Databases:";
-        this.lblListDb.Location = new System.Drawing.Point(20, 225);
+        this.lblListDb.Location = new System.Drawing.Point(20, 195);
         this.lblListDb.AutoSize = true;
         this.tabDatabase.Controls.Add(this.lblListDb);
 
         // Database listbox
         this.listDb = new ListBox();
-        this.listDb.Location = new System.Drawing.Point(20, 250);
+        this.listDb.Location = new System.Drawing.Point(20, 220);
         this.listDb.Size = new System.Drawing.Size(500, 200);
         this.tabDatabase.Controls.Add(listDb);
 
         // Count db button
         this.btnCountDatabases = new Button();
         this.btnCountDatabases.Text = "Count Databases";
-        this.btnCountDatabases.Location = new System.Drawing.Point(540, 250);
+        this.btnCountDatabases.Location = new System.Drawing.Point(525, 220);
         this.btnCountDatabases.AutoSize = true;
         this.btnCountDatabases.Click += BtnCountDatabases_Click;
         this.tabDatabase.Controls.Add(this.btnCountDatabases);
@@ -198,7 +199,7 @@ partial class CosmosExplorerForm
         // Button: List DBs with table counts
         this.btnListDbsWithTables = new Button();
         this.btnListDbsWithTables.Text = "Count Tables per DB";
-        this.btnListDbsWithTables.Location = new System.Drawing.Point(540, 290);
+        this.btnListDbsWithTables.Location = new System.Drawing.Point(525, 260);
         this.btnListDbsWithTables.Size = new System.Drawing.Size(200, 35);
         this.btnListDbsWithTables.Click += BtnListDbsWithTableCount_Click;
         this.tabDatabase.Controls.Add(this.btnListDbsWithTables);
@@ -208,20 +209,20 @@ partial class CosmosExplorerForm
         // Label: Filter DBs
         this.lblFilterDb = new System.Windows.Forms.Label();
         this.lblFilterDb.Text = "Filter DBs starting with:";
-        this.lblFilterDb.Location = new System.Drawing.Point(20, 445);
+        this.lblFilterDb.Location = new System.Drawing.Point(20, 410);
         this.lblFilterDb.AutoSize = true;
         this.tabDatabase.Controls.Add(this.lblFilterDb);
 
         // TextBox: Filter prefix
         this.txtDbPrefix = new System.Windows.Forms.TextBox();
-        this.txtDbPrefix.Location = new System.Drawing.Point(210, 440);
+        this.txtDbPrefix.Location = new System.Drawing.Point(210, 405);
         this.txtDbPrefix.Width = 200;
         this.tabDatabase.Controls.Add(this.txtDbPrefix);
 
         // Button: Filter DBs
         this.btnFilterDb = new System.Windows.Forms.Button();
         this.btnFilterDb.Text = "Filter";
-        this.btnFilterDb.Location = new System.Drawing.Point(420, 438);
+        this.btnFilterDb.Location = new System.Drawing.Point(420, 405);
         this.btnFilterDb.Size = new System.Drawing.Size(100, 30);
         this.btnFilterDb.Click += BtnFilterDb_Click;
         this.tabDatabase.Controls.Add(this.btnFilterDb);
@@ -229,27 +230,35 @@ partial class CosmosExplorerForm
         this.chkMatchTables = new System.Windows.Forms.CheckBox();
         this.chkMatchTables.Text = "Only DBs containing matching tables";
         this.chkMatchTables.AutoSize = true;
-        this.chkMatchTables.Location = new System.Drawing.Point(20, 475);
+        this.chkMatchTables.Location = new System.Drawing.Point(20, 440);
         this.tabDatabase.Controls.Add(this.chkMatchTables);
 
         // Checkbox: Show only longest DB name(s)
         this.chkLongestNames = new System.Windows.Forms.CheckBox();
         this.chkLongestNames.Text = "Show only longest DB name(s)";
         this.chkLongestNames.AutoSize = true;
-        this.chkLongestNames.Location = new System.Drawing.Point(20, 515);
+        this.chkLongestNames.Location = new System.Drawing.Point(20, 470);
         this.tabDatabase.Controls.Add(this.chkLongestNames);
+
+        // Button: Show DB(s) with most tables
+        this.btnMostTables = new System.Windows.Forms.Button();
+        this.btnMostTables.Text = "Show DB(s) with Most Tables";
+        this.btnMostTables.Location = new System.Drawing.Point(20, 500); // adjust Y to fit below existing controls
+        this.btnMostTables.Size = new System.Drawing.Size(250, 30);
+        this.btnMostTables.Click += BtnMostTables_Click;
+        this.tabDatabase.Controls.Add(this.btnMostTables);
 
         // Label: Filter Results
         this.lblFilterResults = new System.Windows.Forms.Label();
         this.lblFilterResults.Text = "Filtered Databases:";
         this.lblFilterResults.AutoSize = true;
-        this.lblFilterResults.Location = new System.Drawing.Point(20, 555);
+        this.lblFilterResults.Location = new System.Drawing.Point(20, 535);
         this.tabDatabase.Controls.Add(this.lblFilterResults);
 
         // ComboBox: Filter results
         this.cmbFilteredDbs = new System.Windows.Forms.ComboBox();
-        this.cmbFilteredDbs.Location = new System.Drawing.Point(270, 550);
-        this.cmbFilteredDbs.Width = 250;
+        this.cmbFilteredDbs.Location = new System.Drawing.Point(200, 535);
+        this.cmbFilteredDbs.Width = 320;
         this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
 
@@ -263,7 +272,7 @@ partial class CosmosExplorerForm
         // Button: Apply condition filter
         this.btnApplyConditionFilter = new Button();
         this.btnApplyConditionFilter.Text = "Show Condition Result";
-        this.btnApplyConditionFilter.Location = new System.Drawing.Point(540, 605);
+        this.btnApplyConditionFilter.Location = new System.Drawing.Point(525, 610);
         this.btnApplyConditionFilter.AutoSize = true;
         this.btnApplyConditionFilter.Click += BtnApplyDbCondition_Click;
         this.tabDatabase.Controls.Add(this.btnApplyConditionFilter);
