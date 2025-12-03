@@ -186,8 +186,36 @@ public partial class CosmosExplorerForm : Form
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        List<string> filteredDbs = await helper.GetDBsStartingWithAsync(prefix);
+        List<string> filteredDbs = [];
         cmbFilteredDbs.Items.Clear();
+        // checkbox logic
+        if (chkMatchTables.Checked)
+        {
+            string output = await helper.GetDbsWithTablesStartingWithAsync(prefix);
+            filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (filteredDbs.Count == 0)
+            {
+                MessageBox.Show("No databases found with matching tables.", "Info",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+        }
+        else if (chkLongestNames.Checked)
+        {
+            string output = await helper.GetLongestDbNameStartingWith(prefix);
+            filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (filteredDbs.Count == 0)
+            {
+                MessageBox.Show("No databases found with that prefix.", "Info",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+        }
+        else
+        // default behavior
+        {
+            filteredDbs = await helper.GetDBsStartingWithAsync(prefix);
+        }
         foreach (string db in filteredDbs)
             cmbFilteredDbs.Items.Add(db);
         // Auto-select first item
@@ -320,8 +348,7 @@ public partial class CosmosExplorerForm : Form
         }
         bool dbExists = await helper.DatabaseExistsAsync(dbName);
         if (dbExists)
-            MessageBox.Show($"Database '{dbName}' exists.", "Info",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            lblCheckDbResult.Text = $"Database '{dbName}' exists.";
         else
             MessageBox.Show($"Database '{dbName}' does not exist.", "Info",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -518,7 +545,6 @@ public partial class CosmosExplorerForm : Form
             listTables.SelectedIndex = 0;
         await UpdateTableCountAsync(dbName);
     }
-
     private async Task UpdateTableCountAsync(string dbName)
     {
         int count = await helper.CountTablesInDBAsync(dbName);

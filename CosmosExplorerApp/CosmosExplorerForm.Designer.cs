@@ -60,6 +60,8 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnMinTableName;
     private System.Windows.Forms.ComboBox cmbMinLegthTables;
     private System.Windows.Forms.CheckBox chkDbNameOnly;
+    private System.Windows.Forms.CheckBox chkMatchTables;
+    private System.Windows.Forms.CheckBox chkLongestNames;
 
 
     /// <summary>
@@ -223,17 +225,30 @@ partial class CosmosExplorerForm
         this.btnFilterDb.Size = new System.Drawing.Size(100, 30);
         this.btnFilterDb.Click += BtnFilterDb_Click;
         this.tabDatabase.Controls.Add(this.btnFilterDb);
+        // Checkbox: Filter DBs that contain tables starting with prefix
+        this.chkMatchTables = new System.Windows.Forms.CheckBox();
+        this.chkMatchTables.Text = "Only DBs containing matching tables";
+        this.chkMatchTables.AutoSize = true;
+        this.chkMatchTables.Location = new System.Drawing.Point(20, 475);
+        this.tabDatabase.Controls.Add(this.chkMatchTables);
+
+        // Checkbox: Show only longest DB name(s)
+        this.chkLongestNames = new System.Windows.Forms.CheckBox();
+        this.chkLongestNames.Text = "Show only longest DB name(s)";
+        this.chkLongestNames.AutoSize = true;
+        this.chkLongestNames.Location = new System.Drawing.Point(20, 515);
+        this.tabDatabase.Controls.Add(this.chkLongestNames);
 
         // Label: Filter Results
         this.lblFilterResults = new System.Windows.Forms.Label();
         this.lblFilterResults.Text = "Filtered Databases:";
         this.lblFilterResults.AutoSize = true;
-        this.lblFilterResults.Location = new System.Drawing.Point(20, 485);
+        this.lblFilterResults.Location = new System.Drawing.Point(20, 555);
         this.tabDatabase.Controls.Add(this.lblFilterResults);
 
         // ComboBox: Filter results
         this.cmbFilteredDbs = new System.Windows.Forms.ComboBox();
-        this.cmbFilteredDbs.Location = new System.Drawing.Point(270, 480);
+        this.cmbFilteredDbs.Location = new System.Drawing.Point(270, 550);
         this.cmbFilteredDbs.Width = 250;
         this.cmbFilteredDbs.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbFilteredDbs);
@@ -242,20 +257,20 @@ partial class CosmosExplorerForm
         this.lblDbConditionDesc = new Label();
         this.lblDbConditionDesc.Text = "Condition: Odd-length names with >=3 tables or 0 tables";
         this.lblDbConditionDesc.AutoSize = true;
-        this.lblDbConditionDesc.Location = new System.Drawing.Point(20, 520);
+        this.lblDbConditionDesc.Location = new System.Drawing.Point(20, 590);
         this.tabDatabase.Controls.Add(this.lblDbConditionDesc);
 
         // Button: Apply condition filter
         this.btnApplyConditionFilter = new Button();
         this.btnApplyConditionFilter.Text = "Show Condition Result";
-        this.btnApplyConditionFilter.Location = new System.Drawing.Point(540, 520);
+        this.btnApplyConditionFilter.Location = new System.Drawing.Point(540, 605);
         this.btnApplyConditionFilter.AutoSize = true;
         this.btnApplyConditionFilter.Click += BtnApplyDbCondition_Click;
         this.tabDatabase.Controls.Add(this.btnApplyConditionFilter);
 
         // ComboBox: Display condition results
         this.cmbConditionResults = new ComboBox();
-        this.cmbConditionResults.Location = new System.Drawing.Point(20, 545);
+        this.cmbConditionResults.Location = new System.Drawing.Point(20, 615);
         this.cmbConditionResults.Width = lblDbConditionDesc.Width;
         this.cmbConditionResults.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbConditionResults);
@@ -263,7 +278,7 @@ partial class CosmosExplorerForm
         // Button: Count All Tables
         this.btnCountAllTables = new System.Windows.Forms.Button();
         this.btnCountAllTables.Text = "Count All Tables in DBs";
-        this.btnCountAllTables.Location = new System.Drawing.Point(20, 590);
+        this.btnCountAllTables.Location = new System.Drawing.Point(20, 660);
         this.btnCountAllTables.Size = new System.Drawing.Size(200, 35);
         this.btnCountAllTables.Click += BtnCountAllTables_Click;
         this.tabDatabase.Controls.Add(this.btnCountAllTables);
@@ -272,33 +287,33 @@ partial class CosmosExplorerForm
         this.lblTotalTables = new System.Windows.Forms.Label();
         this.lblTotalTables.Text = "Total tables in all DBs: ";
         this.lblTotalTables.AutoSize = true;
-        this.lblTotalTables.Location = new System.Drawing.Point(250, 590);
+        this.lblTotalTables.Location = new System.Drawing.Point(250, 660);
         this.tabDatabase.Controls.Add(this.lblTotalTables);
 
         // Label: Enter table count
         this.lblExactTableCount = new Label();
         this.lblExactTableCount.Text = "Enter exact table count:";
-        this.lblExactTableCount.Location = new System.Drawing.Point(20, 640);
+        this.lblExactTableCount.Location = new System.Drawing.Point(20, 710);
         this.lblExactTableCount.AutoSize = true;
         this.tabDatabase.Controls.Add(this.lblExactTableCount);
 
         // TextBox: User input for table count
         this.txtExactTableCount = new TextBox();
-        this.txtExactTableCount.Location = new System.Drawing.Point(220, 635);
+        this.txtExactTableCount.Location = new System.Drawing.Point(220, 705);
         this.txtExactTableCount.Width = 100;
         this.tabDatabase.Controls.Add(this.txtExactTableCount);
 
         // Button: Show DBs with exact table count
         this.btnExactTableCount = new Button();
         this.btnExactTableCount.Text = "Show DBs";
-        this.btnExactTableCount.Location = new System.Drawing.Point(330, 633);
+        this.btnExactTableCount.Location = new System.Drawing.Point(330, 703);
         this.btnExactTableCount.Size = new System.Drawing.Size(120, 30);
         this.btnExactTableCount.Click += BtnExactTableCount_Click;
         this.tabDatabase.Controls.Add(this.btnExactTableCount);
 
         // ComboBox: Display result
         this.cmbExactTableCountResult = new ComboBox();
-        this.cmbExactTableCountResult.Location = new System.Drawing.Point(20, 670);
+        this.cmbExactTableCountResult.Location = new System.Drawing.Point(20, 740);
         this.cmbExactTableCountResult.Width = lblDbConditionDesc.Width;
         this.cmbExactTableCountResult.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabDatabase.Controls.Add(this.cmbExactTableCountResult);
@@ -309,19 +324,19 @@ partial class CosmosExplorerForm
         this.lblCheckDb = new System.Windows.Forms.Label();
         this.lblCheckDb.Text = "Check if DB Exists:";
         this.lblCheckDb.AutoSize = true;
-        this.lblCheckDb.Location = new System.Drawing.Point(20, 720);
+        this.lblCheckDb.Location = new System.Drawing.Point(20, 790);
         this.tabDatabase.Controls.Add(this.lblCheckDb);
 
         // TextBox
         this.txtCheckDb = new System.Windows.Forms.TextBox();
-        this.txtCheckDb.Location = new System.Drawing.Point(200, 715);
+        this.txtCheckDb.Location = new System.Drawing.Point(200, 785);
         this.txtCheckDb.Width = 200;
         this.tabDatabase.Controls.Add(this.txtCheckDb);
 
         // Button
         this.btnCheckDb = new System.Windows.Forms.Button();
         this.btnCheckDb.Text = "Check";
-        this.btnCheckDb.Location = new System.Drawing.Point(420, 712);
+        this.btnCheckDb.Location = new System.Drawing.Point(420, 782);
         this.btnCheckDb.Size = new System.Drawing.Size(100, 30);
         this.btnCheckDb.Click += BtnCheckDbExists_Click;
         this.tabDatabase.Controls.Add(this.btnCheckDb);
@@ -329,7 +344,7 @@ partial class CosmosExplorerForm
         // Result Label
         this.lblCheckDbResult = new System.Windows.Forms.Label();
         this.lblCheckDbResult.AutoSize = true;
-        this.lblCheckDbResult.Location = new System.Drawing.Point(20, 760);
+        this.lblCheckDbResult.Location = new System.Drawing.Point(20, 830);
         this.lblCheckDbResult.Text = "";
         this.tabDatabase.Controls.Add(this.lblCheckDbResult);
 

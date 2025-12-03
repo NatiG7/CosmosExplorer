@@ -276,5 +276,41 @@ namespace cloudApp
             }
             return result;
         }
+        public async Task<string> GetDbsWithTablesStartingWithAsync(string userStr)
+        {
+            List<string> listOfDbsFound = [];
+            List<string> allDbsStartWith = await GetDBsStartingWithAsync(userStr);
+            foreach (string currentDbName in allDbsStartWith)
+            {
+                List<string> tables = await GetTablesAsync(currentDbName);
+                if (tables.Any(t => t.StartsWith(userStr, StringComparison.OrdinalIgnoreCase)))
+                {
+                    listOfDbsFound.Add(currentDbName);
+                }
+            }
+            return string.Join(", ", listOfDbsFound);
+        }
+        public async Task<string> GetLongestDbNameStartingWith(string userStr)
+        {
+            List<string> allDbsStartWith = await GetDBsStartingWithAsync(userStr);
+            if (allDbsStartWith.Count == 0)
+                return string.Empty;
+            List<string> filteredDbs = [];
+            foreach (string dbName in allDbsStartWith)
+            {
+                List<string> tables = await GetTablesAsync(dbName);
+                if (tables.Any(t => t.StartsWith(userStr, StringComparison.OrdinalIgnoreCase)))
+                {
+                    filteredDbs.Add(dbName);
+                }
+            }
+            if (filteredDbs.Count == 0)
+                return string.Empty;
+            int maxLen = allDbsStartWith.Max(db => db.Length);
+            List<string> longestNames = allDbsStartWith
+                .Where(db => db.Length == maxLen)
+                .ToList();
+            return string.Join(", ", longestNames);
+        }
     }
 }
