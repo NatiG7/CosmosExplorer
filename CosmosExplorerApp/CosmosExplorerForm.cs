@@ -546,6 +546,38 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
+    private async void BtnSaveClient_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        string dbName = txtClientDbName.Text.Trim();
+        string tableName = txtClientTableName.Text.Trim();
+        if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName))
+        {
+            MessageBox.Show("Please enter both database and table names.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        StudentInfo student = new StudentInfo
+        {
+            id = Guid.NewGuid().ToString(),
+            idNum = txtClientTz.Text.Trim(),
+            firstName = txtClientFirstName.Text.Trim(),
+            lastName = txtClientLastName.Text.Trim(),
+            Courses = []
+        };
+
+        try
+        {
+            await helper.SaveItemToCosmosAsync(dbName, tableName, student);
+            MessageBox.Show("Student info saved successfully!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            txtClientTz.Clear();
+            txtClientFirstName.Clear();
+            txtClientLastName.Clear();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error saving to Cosmos DB: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())
@@ -589,6 +621,37 @@ public partial class CosmosExplorerForm : Form
     {
         int count = await helper.CountTablesInDBAsync(dbName);
         lblTableCount.Text = $"Tables / Containers: {count}";
+    }
+    private async Task ValidateTextboxAsync(
+            TextBox textbox,
+                Label indicatorLabel,
+                    Func<string, Task<bool>> validateFunc)
+    {
+        string value = textbox.Text.Trim();
+
+        if (string.IsNullOrEmpty(value))
+        {
+            indicatorLabel.Text = "";
+            return;
+        }
+
+        bool exists = await validateFunc(value);
+
+        indicatorLabel.Text = exists ? "✔" : "✖";
+        indicatorLabel.ForeColor = exists ? Color.Green : Color.Red;
+    }
+    private async void TxtClientDbName_TextChanged(object sender, EventArgs e)
+    {
+        await ValidateTextboxAsync(
+            txtClientDbName,
+                lblDbCheck,
+                    helper.DatabaseExistsAsync);
+    }
+    private async void TxtClientTableName_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtClientDbName.Text.Trim();
+        await ValidateTextboxAsync(txtClientTableName, lblTbCheck,
+                table => helper.TableExistsAsync(db, table));
     }
 
 }
