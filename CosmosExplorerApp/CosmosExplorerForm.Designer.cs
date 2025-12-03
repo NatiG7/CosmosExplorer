@@ -59,6 +59,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtMinTableLengthInput;
     private System.Windows.Forms.Button btnMinTableName;
     private System.Windows.Forms.ComboBox cmbMinLegthTables;
+    private System.Windows.Forms.CheckBox chkDbNameOnly;
 
 
     /// <summary>
@@ -464,10 +465,17 @@ partial class CosmosExplorerForm
 
         // ComboBox: Display result
         this.cmbMinLegthTables = new ComboBox();
-        this.cmbMinLegthTables.Location = new System.Drawing.Point(20, 250);
+        this.cmbMinLegthTables.Location = new System.Drawing.Point(20, 290);
         this.cmbMinLegthTables.Width = comboDbTables.Width;
         this.cmbMinLegthTables.DropDownStyle = ComboBoxStyle.DropDownList;
         this.tabContainers.Controls.Add(this.cmbMinLegthTables);
+
+        // Checkbox: Show DB names only once
+        this.chkDbNameOnly = new CheckBox();
+        this.chkDbNameOnly.Text = "Return DB names without duplicate entries";
+        this.chkDbNameOnly.Location = new System.Drawing.Point(20, 250);
+        this.chkDbNameOnly.AutoSize = true;
+        this.tabContainers.Controls.Add(this.chkDbNameOnly);
 
         #endregion
 

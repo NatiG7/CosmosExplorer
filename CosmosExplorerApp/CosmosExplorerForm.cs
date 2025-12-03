@@ -441,6 +441,8 @@ public partial class CosmosExplorerForm : Form
             if (!validateHelper()) return;
             cmbMinLegthTables.Items.Clear();
             int minLength = int.Parse(txtMinTableLengthInput.Text.Trim());
+            // flag for displaying DB names only once
+            bool returnDbNamesOnlyOnce = chkDbNameOnly.Checked;
             List<string> dbs = await helper.GetDatabasesAsync();
             foreach (string db in dbs)
             {
@@ -449,7 +451,15 @@ public partial class CosmosExplorerForm : Form
                 {
                     if (table.Length > minLength)
                     {
-                        cmbMinLegthTables.Items.Add($"{db} : {table}");
+                        if (returnDbNamesOnlyOnce)
+                        {
+                            {
+                                cmbMinLegthTables.Items.Add(db);
+                                break;
+                            }
+                        }
+                        else
+                            cmbMinLegthTables.Items.Add($"{db} : {table}");
                     }
                 }
             }
