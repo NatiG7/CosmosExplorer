@@ -189,6 +189,12 @@ public partial class CosmosExplorerForm : Form
         List<string> filteredDbs = [];
         cmbFilteredDbs.Items.Clear();
         // checkbox logic
+        if (chkMatchTables.Checked && chkLongestNames.Checked)
+        {
+            MessageBox.Show("Please select only one option at a time.", "Warning",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
         if (chkMatchTables.Checked)
         {
             string output = await helper.GetDbsWithTablesStartingWithAsync(prefix);
