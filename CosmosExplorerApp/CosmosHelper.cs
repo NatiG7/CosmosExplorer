@@ -1,6 +1,7 @@
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace cloudApp
@@ -344,6 +345,23 @@ namespace cloudApp
                 return "There are no tables in any of the databases.";
 
             return string.Join(", ", resultDbs);
+        }
+        public async Task SaveItemToCosmosAsync<T>(string dbName, string containerName, T item)
+        {
+            Database db = cosmosClient.GetDatabase(dbName);
+            Container container;
+            try
+            {
+                container = db.GetContainer(containerName);
+                // just check if exists by calling ReadContainerAsync
+                await container.ReadContainerAsync();
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                // create container if it does not exist
+                container = await db.CreateContainerIfNotExistsAsync(containerName, "/Id");
+            }
+            await container.CreateItemAsync(item, new PartitionKey(Guid.NewGuid().ToString()));
         }
     }
 }

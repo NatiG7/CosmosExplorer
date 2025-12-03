@@ -12,6 +12,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TabPage tabDatabase;
     private System.Windows.Forms.TabPage tabContainers;
     private System.Windows.Forms.TabPage tabDocuments;
+    private System.Windows.Forms.TabPage tabClient;
     private System.Windows.Forms.Label lblEndpoint;
     private System.Windows.Forms.TextBox endpointTxtBox;
     private System.Windows.Forms.Label lblPkey;
@@ -63,6 +64,17 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.CheckBox chkMatchTables;
     private System.Windows.Forms.CheckBox chkLongestNames;
     private System.Windows.Forms.Button btnMostTables;
+    private System.Windows.Forms.Label lblClientDbName;
+    private System.Windows.Forms.Label lblClientTableName;
+    private System.Windows.Forms.Label lblClientTz;
+    private System.Windows.Forms.Label lblClientFirstName;
+    private System.Windows.Forms.Label lblClientLastName;
+    private System.Windows.Forms.TextBox txtClientDbName;
+    private System.Windows.Forms.TextBox txtClientTableName;
+    private System.Windows.Forms.TextBox txtClientTz;
+    private System.Windows.Forms.TextBox txtClientFirstName;
+    private System.Windows.Forms.TextBox txtClientLastName;
+    private System.Windows.Forms.Button btnSaveClient;
 
 
     /// <summary>
@@ -101,6 +113,7 @@ partial class CosmosExplorerForm
         this.tabDatabase = new System.Windows.Forms.TabPage();
         this.tabContainers = new System.Windows.Forms.TabPage();
         this.tabDocuments = new System.Windows.Forms.TabPage();
+        this.tabClient = new System.Windows.Forms.TabPage();
 
         this.tabControl1.Location = new System.Drawing.Point(10, 10);
         this.tabControl1.Size = new System.Drawing.Size(850, 870);
@@ -108,10 +121,12 @@ partial class CosmosExplorerForm
         this.tabDatabase.Text = "Databases";
         this.tabContainers.Text = "Containers";
         this.tabDocuments.Text = "Documents";
+        this.tabClient.Text = "Client / Student Info";
 
         this.tabControl1.Controls.Add(this.tabDatabase);
         this.tabControl1.Controls.Add(this.tabContainers);
         this.tabControl1.Controls.Add(this.tabDocuments);
+        this.tabControl1.Controls.Add(this.tabClient);
 
         this.Controls.Add(this.tabControl1);
 
@@ -511,8 +526,77 @@ partial class CosmosExplorerForm
         // Reserved area for future:
 
         #endregion
+
+        #region Client/Student Info
+        // Database name
+        this.lblClientDbName = new Label();
+        this.lblClientDbName.Text = "Database Name:";
+        this.lblClientDbName.Location = new System.Drawing.Point(20, 20);
+        this.lblClientDbName.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientDbName);
+
+        this.txtClientDbName = new TextBox();
+        this.txtClientDbName.Location = new System.Drawing.Point(180, 20);
+        this.txtClientDbName.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientDbName);
+
+        // Table name
+        this.lblClientTableName = new Label();
+        this.lblClientTableName.Text = "Table Name:";
+        this.lblClientTableName.Location = new System.Drawing.Point(20, 60);
+        this.lblClientTableName.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientTableName);
+
+        this.txtClientTableName = new TextBox();
+        this.txtClientTableName.Location = new System.Drawing.Point(180, 60);
+        this.txtClientTableName.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientTableName);
+
+        // student ID (Tz)
+        this.lblClientTz = new Label();
+        this.lblClientTz.Text = "Student ID (Tz):";
+        this.lblClientTz.Location = new System.Drawing.Point(20, 100);
+        this.lblClientTz.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientTz);
+
+        this.txtClientTz = new TextBox();
+        this.txtClientTz.Location = new System.Drawing.Point(180, 100);
+        this.txtClientTz.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientTz);
+
+        // First Name
+        this.lblClientFirstName = new Label();
+        this.lblClientFirstName.Text = "First Name:";
+        this.lblClientFirstName.Location = new System.Drawing.Point(20, 140);
+        this.lblClientFirstName.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientFirstName);
+
+        this.txtClientFirstName = new TextBox();
+        this.txtClientFirstName.Location = new System.Drawing.Point(180, 140);
+        this.txtClientFirstName.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientFirstName);
+
+        // Last Name
+        this.lblClientLastName = new Label();
+        this.lblClientLastName.Text = "Last Name:";
+        this.lblClientLastName.Location = new System.Drawing.Point(20, 180);
+        this.lblClientLastName.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientLastName);
+
+        this.txtClientLastName = new TextBox();
+        this.txtClientLastName.Location = new System.Drawing.Point(180, 180);
+        this.txtClientLastName.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientLastName);
+
+        // Save button
+        this.btnSaveClient = new Button();
+        this.btnSaveClient.Text = "Save Student Info";
+        this.btnSaveClient.Location = new System.Drawing.Point(20, 220);
+        this.btnSaveClient.AutoSize = true;
+        this.btnSaveClient.Click += BtnSaveClient_Click;
+        this.tabClient.Controls.Add(this.btnSaveClient);
+
+        #endregion
     }
-
-
     #endregion
 }
