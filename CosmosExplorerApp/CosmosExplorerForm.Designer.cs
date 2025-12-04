@@ -76,6 +76,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtClientFirstName;
     private System.Windows.Forms.TextBox txtClientLastName;
     private System.Windows.Forms.Button btnSaveClient;
+    private System.Windows.Forms.Label lblTbCheck;
 
 
     /// <summary>
@@ -544,7 +545,7 @@ partial class CosmosExplorerForm
 
         // DB Exists indicator
         this.lblDbCheck = new Label();
-        this.lblDbCheck.Text = "";                // empty by default
+        this.lblDbCheck.Text = "";
         this.lblDbCheck.ForeColor = Color.Green;
         this.lblDbCheck.Location = new System.Drawing.Point(390, 20);
         this.lblDbCheck.AutoSize = true;
@@ -560,7 +561,16 @@ partial class CosmosExplorerForm
         this.txtClientTableName = new TextBox();
         this.txtClientTableName.Location = new System.Drawing.Point(180, 60);
         this.txtClientTableName.Width = 200;
+        this.txtClientTableName.TextChanged += TxtClientTableName_TextChanged;
         this.tabClient.Controls.Add(this.txtClientTableName);
+
+        // Table exists indicator
+        this.lblTbCheck = new Label();
+        this.lblTbCheck.Text = "";
+        this.lblTbCheck.ForeColor = Color.Green;
+        this.lblTbCheck.Location = new System.Drawing.Point(390, 60);
+        this.lblTbCheck.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblTbCheck);
 
         // student ID (Tz)
         this.lblClientTz = new Label();

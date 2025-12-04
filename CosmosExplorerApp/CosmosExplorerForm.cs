@@ -650,7 +650,7 @@ public partial class CosmosExplorerForm : Form
     private async void TxtClientTableName_TextChanged(object sender, EventArgs e)
     {
         string db = txtClientDbName.Text.Trim();
-        await ValidateTextboxAsync(txtClientTableName, lblTableCount,
+        await ValidateTextboxAsync(txtClientTableName, lblTbCheck,
                 table => helper.TableExistsAsync(db, table));
     }
 
