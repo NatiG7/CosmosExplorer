@@ -77,6 +77,16 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtClientLastName;
     private System.Windows.Forms.Button btnSaveClient;
     private System.Windows.Forms.Label lblTbCheck;
+    private System.Windows.Forms.Button btnLoadJsonFile;
+    private System.Windows.Forms.Button btnInsertToCloud;
+    private System.Windows.Forms.Button btnUpdateCloud;
+    private System.Windows.Forms.Button btnDeleteCloud;
+    private System.Windows.Forms.Button btnReadCloud;
+    private System.Windows.Forms.RichTextBox txtJsonContent;
+    private System.Windows.Forms.Label lblJsonStatus;
+    private System.Windows.Forms.Label lblClientId;
+    private System.Windows.Forms.TextBox txtClientId;
+    private System.Windows.Forms.Label lblIdCheck;
 
 
     /// <summary>
@@ -260,7 +270,7 @@ partial class CosmosExplorerForm
         // Button: Show DB(s) with most tables
         this.btnMostTables = new System.Windows.Forms.Button();
         this.btnMostTables.Text = "Show DB(s) with Most Tables";
-        this.btnMostTables.Location = new System.Drawing.Point(20, 500); // adjust Y to fit below existing controls
+        this.btnMostTables.Location = new System.Drawing.Point(20, 500);
         this.btnMostTables.Size = new System.Drawing.Size(250, 30);
         this.btnMostTables.Click += BtnMostTables_Click;
         this.tabDatabase.Controls.Add(this.btnMostTables);
@@ -572,49 +582,126 @@ partial class CosmosExplorerForm
         this.lblTbCheck.AutoSize = true;
         this.tabClient.Controls.Add(this.lblTbCheck);
 
+        /// Document ID (Cosmos PK)
+        this.lblClientId = new Label();
+        this.lblClientId.Text = "Document ID:";
+        this.lblClientId.Location = new System.Drawing.Point(20, 100);
+        this.lblClientId.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblClientId);
+
+        // Document exists indicator
+        this.lblIdCheck = new Label();
+        this.lblIdCheck.Text = "";
+        this.lblIdCheck.ForeColor = Color.Green;
+        this.lblIdCheck.Location = new System.Drawing.Point(390, 60);
+        this.lblIdCheck.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblIdCheck);
+
+        this.txtClientId = new TextBox();
+        this.txtClientId.Location = new System.Drawing.Point(180, 100);
+        this.txtClientId.Width = 200;
+        this.tabClient.Controls.Add(this.txtClientId);
+
         // student ID (Tz)
         this.lblClientTz = new Label();
         this.lblClientTz.Text = "Student ID (Tz):";
-        this.lblClientTz.Location = new System.Drawing.Point(20, 100);
+        this.lblClientTz.Location = new System.Drawing.Point(20, 140);
         this.lblClientTz.AutoSize = true;
         this.tabClient.Controls.Add(this.lblClientTz);
 
         this.txtClientTz = new TextBox();
-        this.txtClientTz.Location = new System.Drawing.Point(180, 100);
+        this.txtClientTz.Location = new System.Drawing.Point(180, 140);
         this.txtClientTz.Width = 200;
         this.tabClient.Controls.Add(this.txtClientTz);
 
         // First Name
         this.lblClientFirstName = new Label();
         this.lblClientFirstName.Text = "First Name:";
-        this.lblClientFirstName.Location = new System.Drawing.Point(20, 140);
+        this.lblClientFirstName.Location = new System.Drawing.Point(20, 180);
         this.lblClientFirstName.AutoSize = true;
         this.tabClient.Controls.Add(this.lblClientFirstName);
 
         this.txtClientFirstName = new TextBox();
-        this.txtClientFirstName.Location = new System.Drawing.Point(180, 140);
+        this.txtClientFirstName.Location = new System.Drawing.Point(180, 180);
         this.txtClientFirstName.Width = 200;
         this.tabClient.Controls.Add(this.txtClientFirstName);
 
         // Last Name
         this.lblClientLastName = new Label();
         this.lblClientLastName.Text = "Last Name:";
-        this.lblClientLastName.Location = new System.Drawing.Point(20, 180);
+        this.lblClientLastName.Location = new System.Drawing.Point(20, 220);
         this.lblClientLastName.AutoSize = true;
         this.tabClient.Controls.Add(this.lblClientLastName);
 
         this.txtClientLastName = new TextBox();
-        this.txtClientLastName.Location = new System.Drawing.Point(180, 180);
+        this.txtClientLastName.Location = new System.Drawing.Point(180, 220);
         this.txtClientLastName.Width = 200;
         this.tabClient.Controls.Add(this.txtClientLastName);
 
         // Save button
         this.btnSaveClient = new Button();
         this.btnSaveClient.Text = "Save Student Info";
-        this.btnSaveClient.Location = new System.Drawing.Point(20, 220);
+        this.btnSaveClient.Location = new System.Drawing.Point(20, 260);
         this.btnSaveClient.AutoSize = true;
         this.btnSaveClient.Click += BtnSaveClient_Click;
         this.tabClient.Controls.Add(this.btnSaveClient);
+
+        #region JSON / Cloud Insert Section (Client Tab)
+
+        // Button: Load JSON from file
+        this.btnLoadJsonFile = new Button();
+        this.btnLoadJsonFile.Text = "File from JSON Load";
+        this.btnLoadJsonFile.Location = new System.Drawing.Point(20, 300);
+        this.btnLoadJsonFile.Size = new System.Drawing.Size(200, 30);
+        this.btnLoadJsonFile.Click += BtnLoadJsonFile_Click;
+        this.tabClient.Controls.Add(this.btnLoadJsonFile);
+
+        // RichTextBox: Display JSON content
+        this.txtJsonContent = new RichTextBox();
+        this.txtJsonContent.Location = new System.Drawing.Point(20, 335);
+        this.txtJsonContent.Size = new System.Drawing.Size(560, 190);
+        this.tabClient.Controls.Add(this.txtJsonContent);
+
+        // Button: Insert to Cloud
+        this.btnInsertToCloud = new Button();
+        this.btnInsertToCloud.Text = "Insert to Cloud";
+        this.btnInsertToCloud.Location = new System.Drawing.Point(20, 545);
+        this.btnInsertToCloud.Size = new System.Drawing.Size(120, 35);
+        this.btnInsertToCloud.Click += BtnInsertToCloud_Click;
+        this.tabClient.Controls.Add(this.btnInsertToCloud);
+
+        // Button: Update in Cloud (placeholder)
+        this.btnUpdateCloud = new Button();
+        this.btnUpdateCloud.Text = "Update in Cloud";
+        this.btnUpdateCloud.Location = new System.Drawing.Point(150, 545);
+        this.btnUpdateCloud.Size = new System.Drawing.Size(120, 35);
+        this.btnUpdateCloud.Click += BtnUpdateCloud_Click;
+        this.tabClient.Controls.Add(this.btnUpdateCloud);
+
+        // Button: Delete from Cloud (placeholder)
+        this.btnDeleteCloud = new Button();
+        this.btnDeleteCloud.Text = "Delete from Cloud";
+        this.btnDeleteCloud.Location = new System.Drawing.Point(280, 545);
+        this.btnDeleteCloud.Size = new System.Drawing.Size(120, 35);
+        this.btnDeleteCloud.Click += BtnDeleteCloud_Click;
+        this.tabClient.Controls.Add(this.btnDeleteCloud);
+
+        // Button: Read / Fetch from Cloud (placeholder)
+        this.btnReadCloud = new Button();
+        this.btnReadCloud.Text = "Read from Cloud";
+        this.btnReadCloud.Location = new System.Drawing.Point(410, 545);
+        this.btnReadCloud.Size = new System.Drawing.Size(120, 35);
+        this.btnReadCloud.Click += BtnReadCloud_Click;
+        this.tabClient.Controls.Add(this.btnReadCloud);
+
+        // Label: JSON operation status
+        this.lblJsonStatus = new Label();
+        this.lblJsonStatus.Text = "";
+        this.lblJsonStatus.AutoSize = true;
+        this.lblJsonStatus.Location = new System.Drawing.Point(20, 580);
+        this.tabClient.Controls.Add(this.lblJsonStatus);
+
+        #endregion
 
         #endregion
     }

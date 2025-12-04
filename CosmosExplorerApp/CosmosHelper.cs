@@ -1,4 +1,5 @@
 using Microsoft.Azure.Cosmos;
+using Newtonsoft.Json.Linq;
 using System.Net;
 
 namespace cloudApp
@@ -252,6 +253,11 @@ namespace cloudApp
 
             return allDbs.Contains(dbName, StringComparer.OrdinalIgnoreCase);
         }
+        public async Task<bool> ItemExistsAsync(string dbName, string containerName, string id)
+        {
+            var item = await GetItemFromCosmosAsync(dbName, containerName, id);
+            return item != null;
+        }
         // --------------------------------------------------------------------
         // Exact table count filter
         // --------------------------------------------------------------------
@@ -343,6 +349,29 @@ namespace cloudApp
 
             return string.Join(", ", resultDbs);
         }
+        public async Task<JObject?> GetItemFromCosmosAsync(string dbName,
+                                                string containerName, string id)
+        {
+            // Get item by id
+            Database db = cosmosClient.GetDatabase(dbName);
+            Container container = db.GetContainer(containerName);
+            try
+            {
+                var response = await container.ReadItemAsync<JObject>(id, new PartitionKey(id));
+                return response.Resource;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+        }
+        public async Task ReplaceItemInCosmosAsync(string dbName, string containerName, string id, JObject item)
+        {
+            // Replace item
+            Database db = cosmosClient.GetDatabase(dbName);
+            Container container = db.GetContainer(containerName);
+            await container.ReplaceItemAsync(item, id, new PartitionKey(id));
+        }
         public async Task SaveItemToCosmosAsync(string dbName, string containerName, StudentInfo item)
         {
             Database db = cosmosClient.GetDatabase(dbName);
@@ -359,6 +388,36 @@ namespace cloudApp
                 container = await db.CreateContainerIfNotExistsAsync(containerName, "/id");
             }
             await container.CreateItemAsync(item, new PartitionKey(item.id));
+        }
+        public async Task<bool> DeleteItemFromCosmosAsync(string dbName, string containerName, string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return false; // indicate failure
+
+            Database db = cosmosClient.GetDatabase(dbName);
+            Container container = db.GetContainer(containerName);
+
+            try
+            {
+                await container.DeleteItemAsync<JObject>(id, new PartitionKey(id));
+                return true;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+        }
+        public async Task SaveJsonItemToCosmosAsync(string dbName, string containerName, JObject item)
+        {
+            Database db = cosmosClient.GetDatabase(dbName);
+            Container dbTable = await db.CreateContainerIfNotExistsAsync(containerName, "/id");
+            string? id = item["id"]?.ToString();
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                id = Guid.NewGuid().ToString();
+                item["id"] = id;
+            }
+            await dbTable.CreateItemAsync(item, new PartitionKey(id));
         }
         public async Task<bool> TableExistsAsync(string dbName, string tableName)
         {

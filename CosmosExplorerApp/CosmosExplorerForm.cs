@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using cloudApp;
-using Microsoft.Azure.Cosmos.Serialization.HybridRow;
+using Newtonsoft.Json.Linq;
 
 public partial class CosmosExplorerForm : Form
 {
@@ -653,5 +653,164 @@ public partial class CosmosExplorerForm : Form
         await ValidateTextboxAsync(txtClientTableName, lblTbCheck,
                 table => helper.TableExistsAsync(db, table));
     }
+    private async void TxtClientId_TextChanged(object sender, EventArgs e)
+    {
+        string dbName = txtClientDbName.Text.Trim();
+        string tableName = txtClientTableName.Text.Trim();
+        string id = txtClientId.Text.Trim();
 
+        if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(id))
+        {
+            lblIdCheck.Text = ""; // clear indicator if any field is empty
+            return;
+        }
+
+        bool exists = await helper.ItemExistsAsync(dbName, tableName, id);
+        lblIdCheck.Text = exists ? "✔" : "✖";
+        lblIdCheck.ForeColor = exists ? Color.Green : Color.Red;
+    }
+    //=======================================================
+    //                    JSON Utils
+    //=======================================================
+    private void BtnLoadJsonFile_Click(object sender, EventArgs e)
+    {
+        using OpenFileDialog ofd = new OpenFileDialog();
+        ofd.Filter = "JSON files|*.json";
+        if (ofd.ShowDialog() == DialogResult.OK)
+        {
+            string json = File.ReadAllText(ofd.FileName);
+            txtJsonContent.Text = json;
+        }
+    }
+    private async void BtnInsertToCloud_Click(object sender, EventArgs e)
+    {
+        string dbName = txtClientDbName.Text.Trim();
+        string tableName = txtClientTableName.Text.Trim();
+        string json = txtJsonContent.Text;
+        if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(json))
+        {
+            lblJsonStatus.Text = "Please fill DB, Table and JSON content.";
+            return;
+        }
+        try
+        {
+            var item = JObject.Parse(json);
+            string? id = item["id"]?.ToString();
+            if (string.IsNullOrEmpty(id))
+            {
+                lblJsonStatus.Text = "JSON must include an 'id' field!";
+                lblJsonStatus.ForeColor = Color.Red;
+                return;
+            }
+            var existing = await helper.GetItemFromCosmosAsync(dbName, tableName, id);
+            if (existing != null)
+            {
+                lblJsonStatus.Text = $"Item '{item["name"]}' with id '{id}' already exists!";
+                lblJsonStatus.ForeColor = Color.Orange;
+                return;
+            }
+            await helper.SaveJsonItemToCosmosAsync(dbName, tableName, item);
+            lblJsonStatus.Text = "Inserted successfully!";
+            lblJsonStatus.ForeColor = Color.Green;
+        }
+        catch (Exception ex)
+        {
+            lblJsonStatus.Text = $"Error: {ex.Message}";
+            lblJsonStatus.ForeColor = Color.Red;
+        }
+    }
+    private async void BtnUpdateCloud_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string dbName = txtClientDbName.Text.Trim();
+            string containerName = txtClientTableName.Text.Trim();
+            string id = txtClientId.Text.Trim();
+            if (string.IsNullOrEmpty(id))
+            {
+                lblJsonStatus.ForeColor = Color.Red;
+                lblJsonStatus.Text = "Cannot update: ID field is empty!";
+                return;
+            }
+            var json = JObject.Parse(txtJsonContent.Text);
+            json["id"] = id; // force correct ID
+            var existing = await helper.GetItemFromCosmosAsync(dbName, containerName, id);
+            if (existing == null)
+            {
+                lblJsonStatus.ForeColor = Color.Orange;
+                lblJsonStatus.Text = $"Item with id '{id}' does not exist!";
+                return;
+            }
+            await helper.ReplaceItemInCosmosAsync(dbName, containerName, id, json);
+            lblJsonStatus.ForeColor = Color.Green;
+            lblJsonStatus.Text = "Updated successfully!";
+        }
+        catch (Exception ex)
+        {
+            lblJsonStatus.ForeColor = Color.Red;
+            lblJsonStatus.Text = "Error: " + ex.Message;
+        }
+    }
+    private async void BtnDeleteCloud_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string dbName = txtClientDbName.Text.Trim();
+            string containerName = txtClientTableName.Text.Trim();
+            string id = txtClientId.Text.Trim();
+            if (string.IsNullOrEmpty(id))
+            {
+                lblJsonStatus.ForeColor = Color.Red;
+                lblJsonStatus.Text = "Cannot delete: ID field is empty!";
+                return;
+            }
+            var existing = await helper.GetItemFromCosmosAsync(dbName, containerName, id);
+            if (existing == null)
+            {
+                lblJsonStatus.ForeColor = Color.Orange;
+                lblJsonStatus.Text = $"Item with id '{id}' does not exist!";
+                return;
+            }
+            await helper.DeleteItemFromCosmosAsync(dbName, containerName, id);
+            lblJsonStatus.ForeColor = Color.Green;
+            lblJsonStatus.Text = "Deleted successfully!";
+        }
+        catch (Exception ex)
+        {
+            lblJsonStatus.ForeColor = Color.Red;
+            lblJsonStatus.Text = "Error: " + ex.Message;
+        }
+    }
+    private async void BtnReadCloud_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            string dbName = txtClientDbName.Text.Trim();
+            string containerName = txtClientTableName.Text.Trim();
+            string id = txtClientId.Text.Trim();
+            if (string.IsNullOrEmpty(id))
+            {
+                lblJsonStatus.ForeColor = Color.Red;
+                lblJsonStatus.Text = "Cannot read: ID field is empty!";
+                return;
+            }
+
+            var existing = await helper.GetItemFromCosmosAsync(dbName, containerName, id);
+            if (existing == null)
+            {
+                lblJsonStatus.ForeColor = Color.Orange;
+                lblJsonStatus.Text = $"Item with id '{id}' does not exist!";
+                return;
+            }
+
+            txtJsonContent.Text = existing.ToString();
+            lblJsonStatus.ForeColor = Color.Green;
+            lblJsonStatus.Text = "Read successfully!";
+        }
+        catch (Exception ex)
+        {
+            lblJsonStatus.ForeColor = Color.Red;
+            lblJsonStatus.Text = "Error: " + ex.Message;
+        }
+    }
 }
