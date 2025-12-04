@@ -70,6 +70,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Label lblClientFirstName;
     private System.Windows.Forms.Label lblClientLastName;
     private System.Windows.Forms.TextBox txtClientDbName;
+    private System.Windows.Forms.Label lblDbCheck;
     private System.Windows.Forms.TextBox txtClientTableName;
     private System.Windows.Forms.TextBox txtClientTz;
     private System.Windows.Forms.TextBox txtClientFirstName;
@@ -538,7 +539,16 @@ partial class CosmosExplorerForm
         this.txtClientDbName = new TextBox();
         this.txtClientDbName.Location = new System.Drawing.Point(180, 20);
         this.txtClientDbName.Width = 200;
+        this.txtClientDbName.TextChanged += TxtClientDbName_TextChanged;
         this.tabClient.Controls.Add(this.txtClientDbName);
+
+        // DB Exists indicator
+        this.lblDbCheck = new Label();
+        this.lblDbCheck.Text = "";                // empty by default
+        this.lblDbCheck.ForeColor = Color.Green;
+        this.lblDbCheck.Location = new System.Drawing.Point(390, 20);
+        this.lblDbCheck.AutoSize = true;
+        this.tabClient.Controls.Add(this.lblDbCheck);
 
         // Table name
         this.lblClientTableName = new Label();

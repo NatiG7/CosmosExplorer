@@ -558,10 +558,10 @@ public partial class CosmosExplorerForm : Form
         }
         StudentInfo student = new StudentInfo
         {
-            Id = Guid.NewGuid().ToString(),
-            Tz = txtClientTz.Text.Trim(),
-            FirstName = txtClientFirstName.Text.Trim(),
-            LastName = txtClientLastName.Text.Trim(),
+            id = Guid.NewGuid().ToString(),
+            idNum = txtClientTz.Text.Trim(),
+            firstName = txtClientFirstName.Text.Trim(),
+            lastName = txtClientLastName.Text.Trim(),
             Courses = []
         };
 
@@ -578,7 +578,6 @@ public partial class CosmosExplorerForm : Form
             MessageBox.Show($"Error saving to Cosmos DB: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
-
     private async Task LoadDatabasesIntoComboBox()
     {
         if (!validateHelper())
@@ -622,6 +621,37 @@ public partial class CosmosExplorerForm : Form
     {
         int count = await helper.CountTablesInDBAsync(dbName);
         lblTableCount.Text = $"Tables / Containers: {count}";
+    }
+    private async Task ValidateTextboxAsync(
+            TextBox textbox,
+                Label indicatorLabel,
+                    Func<string, Task<bool>> validateFunc)
+    {
+        string value = textbox.Text.Trim();
+
+        if (string.IsNullOrEmpty(value))
+        {
+            indicatorLabel.Text = "";
+            return;
+        }
+
+        bool exists = await validateFunc(value);
+
+        indicatorLabel.Text = exists ? "✔" : "✖";
+        indicatorLabel.ForeColor = exists ? Color.Green : Color.Red;
+    }
+    private async void TxtClientDbName_TextChanged(object sender, EventArgs e)
+    {
+        await ValidateTextboxAsync(
+            txtClientDbName,
+                lblDbCheck,
+                    helper.DatabaseExistsAsync);
+    }
+    private async void TxtClientTableName_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtClientDbName.Text.Trim();
+        await ValidateTextboxAsync(txtClientTableName, lblTableCount,
+                table => helper.TableExistsAsync(db, table));
     }
 
 }

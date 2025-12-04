@@ -1,8 +1,5 @@
 using Microsoft.Azure.Cosmos;
-using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace cloudApp
 {
@@ -346,7 +343,7 @@ namespace cloudApp
 
             return string.Join(", ", resultDbs);
         }
-        public async Task SaveItemToCosmosAsync<T>(string dbName, string containerName, T item)
+        public async Task SaveItemToCosmosAsync(string dbName, string containerName, StudentInfo item)
         {
             Database db = cosmosClient.GetDatabase(dbName);
             Container container;
@@ -359,9 +356,23 @@ namespace cloudApp
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 // create container if it does not exist
-                container = await db.CreateContainerIfNotExistsAsync(containerName, "/Id");
+                container = await db.CreateContainerIfNotExistsAsync(containerName, "/id");
             }
-            await container.CreateItemAsync(item, new PartitionKey(Guid.NewGuid().ToString()));
+            await container.CreateItemAsync(item, new PartitionKey(item.id));
+        }
+        public async Task<bool> TableExistsAsync(string dbName, string tableName)
+        {
+            try
+            {
+                Database db = cosmosClient.GetDatabase(dbName);
+                Container container = db.GetContainer(tableName);
+                await container.ReadContainerAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
