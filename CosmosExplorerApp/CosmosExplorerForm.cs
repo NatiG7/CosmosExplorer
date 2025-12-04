@@ -661,7 +661,7 @@ public partial class CosmosExplorerForm : Form
 
         if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName) || string.IsNullOrEmpty(id))
         {
-            lblIdCheck.Text = ""; // clear indicator if any field is empty
+            lblIdCheck.Text = "";
             return;
         }
 

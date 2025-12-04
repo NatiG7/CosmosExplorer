@@ -593,13 +593,14 @@ partial class CosmosExplorerForm
         this.lblIdCheck = new Label();
         this.lblIdCheck.Text = "";
         this.lblIdCheck.ForeColor = Color.Green;
-        this.lblIdCheck.Location = new System.Drawing.Point(390, 60);
+        this.lblIdCheck.Location = new System.Drawing.Point(390, 100);
         this.lblIdCheck.AutoSize = true;
         this.tabClient.Controls.Add(this.lblIdCheck);
 
         this.txtClientId = new TextBox();
         this.txtClientId.Location = new System.Drawing.Point(180, 100);
         this.txtClientId.Width = 200;
+        this.txtClientId.TextChanged += TxtClientId_TextChanged;
         this.tabClient.Controls.Add(this.txtClientId);
 
         // student ID (Tz)
