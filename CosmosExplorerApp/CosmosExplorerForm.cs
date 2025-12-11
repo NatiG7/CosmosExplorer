@@ -939,4 +939,26 @@ public partial class CosmosExplorerForm : Form
             lblJsonStatus.Text = "Error: " + ex.Message;
         }
     }
+    private async void BtnCountAllDocs_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper())
+            return;
+        try
+        {
+            btnCountAllDocs.Enabled = false;
+            btnCountAllDocs.Text = "Counting...";
+            int itemCount = await helper.CountAllItemsAsync();
+            lblDocCountResult.Text = $"Total items in all DBs: {itemCount}";
+
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnCountAllDocs.Enabled = true;
+            btnCountAllDocs.Text = "Count ALL Items (Global)";
+        }
+    }
 }

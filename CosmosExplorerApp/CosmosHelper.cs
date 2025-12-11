@@ -369,5 +369,39 @@ namespace cloudApp
             }
             return results;
         }
+        public async Task<Container?> GetTableAsync(string table)
+        {
+            List<string> allTables = await GetTablesAsync();
+            string? foundTable = allTables.FirstOrDefault(t => t.EndsWith($" - {table}"
+                                                , StringComparison.OrdinalIgnoreCase));
+            if (foundTable == null) return null;
+            string[] parts = foundTable.Split([" - "], StringSplitOptions.None);
+            string dbName = parts[0];
+            return cosmosClient.GetDatabase(dbName).GetContainer(table);
+        }
+        public async Task<List<string>> GetItemsInTableAsync(string table)
+        {
+            Container? tableContainer = await GetTableAsync(table);
+            if (tableContainer == null) return [];
+            FeedIterator<JObject> itemIterator = tableContainer.GetItemQueryIterator<JObject>();
+            List<JObject> itemList = await ExecuteQueryAsync(itemIterator);
+            return itemList.Select(item => item["id"]?.ToString() ?? "Unknown").ToList();
+        }
+        public async Task<int> CountItemsInTableAsync(string table)
+        {
+            return (await GetItemsInTableAsync(table)).Count;
+        }
+        public async Task<int> CountAllItemsAsync()
+        {
+            int totCount = 0;
+            List<string> allTables = await GetTablesAsync();
+            foreach (string table in allTables)
+            {
+                string[] parts = table.Split([" - "], StringSplitOptions.None);
+                string tableName = parts[1];
+                totCount += await CountItemsInTableAsync(tableName);
+            }
+            return totCount;
+        }
     }
 }

@@ -89,12 +89,15 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Label lblIdCheck;
     private System.Windows.Forms.Button btnClearJson;
     private System.Windows.Forms.ComboBox cmbEntityMode;
-    private Label lblCourses;
-    private TextBox txtCourses;
-    private Label lblProducts;
-    private TextBox txtProducts;
-    private Label lblBranches;
-    private TextBox txtBranches;
+    private System.Windows.Forms.Label lblCourses;
+    private System.Windows.Forms.TextBox txtCourses;
+    private System.Windows.Forms.Label lblProducts;
+    private System.Windows.Forms.TextBox txtProducts;
+    private System.Windows.Forms.Label lblBranches;
+    private System.Windows.Forms.TextBox txtBranches;
+    private System.Windows.Forms.Button btnCountAllDocs;
+    private System.Windows.Forms.Label lblDocCountResult;
+    
 
 
     /// <summary>
@@ -220,7 +223,7 @@ partial class CosmosExplorerForm
         // Database listbox
         this.listDb = new ListBox();
         this.listDb.Location = new System.Drawing.Point(20, 220);
-        this.listDb.Size = new System.Drawing.Size(500, 200);
+        this.listDb.Size = new System.Drawing.Size(500, 180);
         this.tabDatabase.Controls.Add(listDb);
 
         // Count db button
@@ -543,7 +546,32 @@ partial class CosmosExplorerForm
         // ========== DOCUMENTS TAB (EMPTY) ===========
         // ===========================================
 
-        // Reserved area for future:
+        // 
+        // btnCountAllDocs
+        // 
+        this.btnCountAllDocs = new System.Windows.Forms.Button();
+        this.btnCountAllDocs.Location = new System.Drawing.Point(20, 30);
+        this.btnCountAllDocs.Name = "btnCountAllDocs";
+        this.btnCountAllDocs.Size = new System.Drawing.Size(200, 40);
+        this.btnCountAllDocs.Text = "Count ALL Items (Global)";
+        this.btnCountAllDocs.UseVisualStyleBackColor = true;
+        this.btnCountAllDocs.Click += new System.EventHandler(this.BtnCountAllDocs_Click);
+
+        // 
+        // lblDocCountResult
+        // 
+        this.lblDocCountResult = new System.Windows.Forms.Label();
+        this.lblDocCountResult.AutoSize = true;
+        this.lblDocCountResult.Location = new System.Drawing.Point(240, 38);
+        this.lblDocCountResult.Name = "lblDocCountResult";
+        this.lblDocCountResult.Size = new System.Drawing.Size(110, 21);
+        this.lblDocCountResult.Text = "Total Items: -";
+
+        // 
+        // Add to TabPage
+        // 
+        this.tabDocuments.Controls.Add(this.btnCountAllDocs);
+        this.tabDocuments.Controls.Add(this.lblDocCountResult);
 
         #endregion
 
