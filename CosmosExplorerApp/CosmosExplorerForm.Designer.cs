@@ -380,7 +380,7 @@ partial class CosmosExplorerForm
         // Result Label
         this.lblCheckDbResult = new System.Windows.Forms.Label();
         this.lblCheckDbResult.AutoSize = true;
-        this.lblCheckDbResult.Location = new System.Drawing.Point(20, 830);
+        this.lblCheckDbResult.Location = new System.Drawing.Point(530, 787);
         this.lblCheckDbResult.Text = "";
         this.tabDatabase.Controls.Add(this.lblCheckDbResult);
 
