@@ -1,0 +1,14 @@
+[
+    {
+        "id": "12345678",
+        "businessName": "Nati G",
+        "Branches": ["Somewhere"], 
+        "Products": ["Some programs"]
+    },
+    {
+        "id": "1234",
+        "businessName": "Technion PET",
+        "Branches": ["Nesher"],
+        "Products": ["Useless courses","like", "8086 MASM", "Android"]
+    }
+]
