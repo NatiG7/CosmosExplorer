@@ -13,6 +13,74 @@ public partial class CosmosExplorerForm : Form
     public CosmosExplorerForm()
     {
         InitializeComponent();
+        InitDynamicLayout();
+    }
+    private void UpdateInputLayout()
+    {
+        string selectedMode = cmbEntityMode.SelectedItem?.ToString() ?? "Student";
+
+        if (selectedMode == "Student")
+        {
+            lblClientTz.Text = "Student ID (Tz):";
+            lblClientFirstName.Text = "First Name:";
+            btnSaveClient.Text = "Save Student Info";
+            lblClientLastName.Visible = true;
+            txtClientLastName.Visible = true;
+            lblCourses.Visible = true;
+            txtCourses.Visible = true;
+            lblProducts.Visible = false;
+            txtProducts.Visible = false;
+            lblBranches.Visible = false;
+            txtBranches.Visible = false;
+        }
+        else if (selectedMode == "Business")
+        {
+            lblClientTz.Text = "Dealer Number:";
+            lblClientFirstName.Text = "Business Name:";
+            btnSaveClient.Text = "Save Business Info";
+            lblClientLastName.Visible = false;
+            txtClientLastName.Visible = false;
+            lblCourses.Visible = false;
+            txtCourses.Visible = false;
+            lblProducts.Visible = true;
+            txtProducts.Visible = true;
+            lblBranches.Visible = true;
+            txtBranches.Visible = true;
+        }
+    }
+    private void InitDynamicLayout()
+    {
+        cmbEntityMode = new ComboBox();
+        cmbEntityMode.Location = new Point(460, 16);
+        cmbEntityMode.Width = 150;
+        cmbEntityMode.DropDownStyle = ComboBoxStyle.DropDownList;
+        cmbEntityMode.Items.Add("Student");
+        cmbEntityMode.Items.Add("Business");
+        cmbEntityMode.SelectedIndexChanged += (s, e) => UpdateInputLayout();
+        tabClient.Controls.Add(cmbEntityMode);
+        lblCourses = new Label { Text = "Courses (comma sep):", Location = new Point(20, 260), AutoSize = true };
+        txtCourses = new TextBox { Location = new Point(220, 260), Width = 200 };
+        lblProducts = new Label { Text = "Products (comma sep):", Location = new Point(20, 260), AutoSize = true };
+        txtProducts = new TextBox { Location = new Point(220, 260), Width = 200 };
+        lblBranches = new Label { Text = "Branches (comma sep):", Location = new Point(20, 300), AutoSize = true };
+        txtBranches = new TextBox { Location = new Point(220, 300), Width = 200 };
+        tabClient.Controls.Add(lblCourses);
+        tabClient.Controls.Add(txtCourses);
+        tabClient.Controls.Add(lblProducts);
+        tabClient.Controls.Add(txtProducts);
+        tabClient.Controls.Add(lblBranches);
+        tabClient.Controls.Add(txtBranches);
+        this.btnSaveClient.Location = new Point(20, 340);
+        this.btnLoadJsonFile.Location = new Point(20, 380);
+        this.btnClearJson.Location = new Point(230, 380);
+        this.txtJsonContent.Location = new Point(20, 420);
+        this.txtJsonContent.Height = 150;
+        this.lblJsonStatus.Location = new Point(20, 580);
+        this.btnInsertToCloud.Location = new Point(20, 610);
+        this.btnUpdateCloud.Location = new Point(150, 610);
+        this.btnDeleteCloud.Location = new Point(280, 610);
+        this.btnReadCloud.Location = new Point(410, 610);
+        cmbEntityMode.SelectedIndex = 0;
     }
     private bool validateHelper()
     {
@@ -557,32 +625,51 @@ public partial class CosmosExplorerForm : Form
         if (!validateHelper()) return;
         string dbName = txtClientDbName.Text.Trim();
         string tableName = txtClientTableName.Text.Trim();
+        string idValue = txtClientTz.Text.Trim();
+        string nameVal = txtClientFirstName.Text.Trim();
         if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName))
         {
             MessageBox.Show("Please enter both database and table names.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        StudentInfo student = new StudentInfo
-        {
-            id = Guid.NewGuid().ToString(),
-            idNum = txtClientTz.Text.Trim(),
-            firstName = txtClientFirstName.Text.Trim(),
-            lastName = txtClientLastName.Text.Trim(),
-            Courses = []
-        };
-
         try
         {
-            await helper.SaveItemToCosmosAsync(dbName, tableName, student);
-            MessageBox.Show("Student info saved successfully!", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            JObject payload = new JObject();
+            string mode = cmbEntityMode.SelectedItem?.ToString() ?? "Student";
+            if (mode == "Student")
+            {
+                // ctor with jobject
+                payload["id"] = idValue;
+                payload["firstName"] = nameVal;
+                payload["lastName"] = txtClientLastName.Text.Trim();
+                payload["adresses"] = new JArray();
+                payload["courses"] = TextToJArray(txtCourses.Text);
+            }
+            else if (mode == "Business")
+            {
+                payload["id"] = idValue;
+                payload["firstName"] = nameVal;
+                payload["branches"] = TextToJArray(txtBranches.Text);
+                payload["products"] = TextToJArray(txtProducts.Text);
+            }
+            await helper.SaveJsonItemToCosmosAsync(dbName, tableName, payload);
+            MessageBox.Show($"{mode} saved successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             txtClientTz.Clear();
             txtClientFirstName.Clear();
             txtClientLastName.Clear();
+            txtCourses.Clear();
+            txtBranches.Clear();
+            txtProducts.Clear();
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error saving to Cosmos DB: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+    }
+    private JArray TextToJArray(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return new JArray();
+        return new JArray(input.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrEmpty(x)));
     }
     private async Task LoadDatabasesIntoComboBox()
     {
@@ -691,7 +778,7 @@ public partial class CosmosExplorerForm : Form
     private void BtnClearJson_Click(object sender, EventArgs e)
     {
         txtJsonContent.Clear();
-        lblJsonStatus.Text ="JSON cleared.";
+        lblJsonStatus.Text = "JSON cleared.";
         lblJsonStatus.ForeColor = Color.Black;
     }
     private async void BtnInsertToCloud_Click(object sender, EventArgs e)

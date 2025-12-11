@@ -88,6 +88,13 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtClientId;
     private System.Windows.Forms.Label lblIdCheck;
     private System.Windows.Forms.Button btnClearJson;
+    private System.Windows.Forms.ComboBox cmbEntityMode;
+    private Label lblCourses;
+    private TextBox txtCourses;
+    private Label lblProducts;
+    private TextBox txtProducts;
+    private Label lblBranches;
+    private TextBox txtBranches;
 
 
     /// <summary>
