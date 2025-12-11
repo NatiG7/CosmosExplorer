@@ -353,12 +353,18 @@ public partial class CosmosExplorerForm : Form
                 "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        bool dbExists = await helper.DatabaseExistsAsync(dbName);
-        if (dbExists)
-            lblCheckDbResult.Text = $"Database '{dbName}' exists.";
-        else
-            MessageBox.Show($"Database '{dbName}' does not exist.", "Info",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        try
+        {
+            bool dbExists = await helper.DatabaseExistsAsync(dbName);
+            lblCheckDbResult.Text = dbExists ? "✔ Exists" : "✖ Not Found";
+            lblCheckDbResult.ForeColor = dbExists ? Color.Green : Color.Red;
+        }
+        catch (Exception ex)
+        {
+            lblCheckDbResult.Text = "Error checking DB.";
+            lblCheckDbResult.ForeColor = Color.Red;
+            MessageBox.Show(ex.Message);
+        }
     }
     private async void BtnCheckTable_Click(object sender, EventArgs e)
     {
@@ -682,6 +688,12 @@ public partial class CosmosExplorerForm : Form
             txtJsonContent.Text = json;
         }
     }
+    private void BtnClearJson_Click(object sender, EventArgs e)
+    {
+        txtJsonContent.Clear();
+        lblJsonStatus.Text ="JSON cleared.";
+        lblJsonStatus.ForeColor = Color.Black;
+    }
     private async void BtnInsertToCloud_Click(object sender, EventArgs e)
     {
         string dbName = txtClientDbName.Text.Trim();
@@ -694,24 +706,51 @@ public partial class CosmosExplorerForm : Form
         }
         try
         {
-            var item = JObject.Parse(json);
-            string? id = item["id"]?.ToString();
-            if (string.IsNullOrEmpty(id))
+            var item = JToken.Parse(json);
+            if (item is JObject jsonItem)
             {
-                lblJsonStatus.Text = "JSON must include an 'id' field!";
-                lblJsonStatus.ForeColor = Color.Red;
-                return;
+                string? id = jsonItem["id"]?.ToString();
+                if (string.IsNullOrEmpty(id))
+                {
+                    lblJsonStatus.Text = "JSON must include an 'id' field!";
+                    lblJsonStatus.ForeColor = Color.Red;
+                    return;
+                }
+                var existing = await helper.GetItemFromCosmosAsync(dbName, tableName, id);
+                if (existing != null)
+                {
+                    lblJsonStatus.Text = $"Item '{jsonItem["name"]}' with id '{id}' already exists!";
+                    lblJsonStatus.ForeColor = Color.Orange;
+                    return;
+                }
+                await helper.SaveJsonItemToCosmosAsync(dbName, tableName, jsonItem);
+                lblJsonStatus.Text = "Inserted successfully!";
+                lblJsonStatus.ForeColor = Color.Green;
             }
-            var existing = await helper.GetItemFromCosmosAsync(dbName, tableName, id);
-            if (existing != null)
+            else if (item is JArray jsonArray)
             {
-                lblJsonStatus.Text = $"Item '{item["name"]}' with id '{id}' already exists!";
-                lblJsonStatus.ForeColor = Color.Orange;
-                return;
+                int successCount = 0;
+                int skippedCount = 0;
+                foreach (JObject arrJsonItem in item)
+                {
+                    string? id = arrJsonItem["id"]?.ToString();
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+                    var existing = await helper.GetItemFromCosmosAsync(dbName, tableName, id);
+                    if (existing != null)
+                    {
+                        skippedCount++;
+                        continue;
+                    }
+                    await helper.SaveJsonItemToCosmosAsync(dbName, tableName, arrJsonItem);
+                    successCount++;
+                }
+                lblJsonStatus.Text = $"Batch Done: {successCount} inserted, {skippedCount} skipped.";
+                lblJsonStatus.ForeColor = Color.Blue;
             }
-            await helper.SaveJsonItemToCosmosAsync(dbName, tableName, item);
-            lblJsonStatus.Text = "Inserted successfully!";
-            lblJsonStatus.ForeColor = Color.Green;
         }
         catch (Exception ex)
         {
