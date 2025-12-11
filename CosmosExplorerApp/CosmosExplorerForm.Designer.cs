@@ -87,6 +87,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Label lblClientId;
     private System.Windows.Forms.TextBox txtClientId;
     private System.Windows.Forms.Label lblIdCheck;
+    private System.Windows.Forms.Button btnClearJson;
 
 
     /// <summary>
@@ -671,7 +672,7 @@ partial class CosmosExplorerForm
         this.btnInsertToCloud.Click += BtnInsertToCloud_Click;
         this.tabClient.Controls.Add(this.btnInsertToCloud);
 
-        // Button: Update in Cloud (placeholder)
+        // Button: Update in Cloud
         this.btnUpdateCloud = new Button();
         this.btnUpdateCloud.Text = "Update in Cloud";
         this.btnUpdateCloud.Location = new System.Drawing.Point(150, 545);
@@ -679,7 +680,7 @@ partial class CosmosExplorerForm
         this.btnUpdateCloud.Click += BtnUpdateCloud_Click;
         this.tabClient.Controls.Add(this.btnUpdateCloud);
 
-        // Button: Delete from Cloud (placeholder)
+        // Button: Delete from Cloud
         this.btnDeleteCloud = new Button();
         this.btnDeleteCloud.Text = "Delete from Cloud";
         this.btnDeleteCloud.Location = new System.Drawing.Point(280, 545);
@@ -687,13 +688,22 @@ partial class CosmosExplorerForm
         this.btnDeleteCloud.Click += BtnDeleteCloud_Click;
         this.tabClient.Controls.Add(this.btnDeleteCloud);
 
-        // Button: Read / Fetch from Cloud (placeholder)
+        // Button: Read / Fetch from Cloud
         this.btnReadCloud = new Button();
         this.btnReadCloud.Text = "Read from Cloud";
         this.btnReadCloud.Location = new System.Drawing.Point(410, 545);
         this.btnReadCloud.Size = new System.Drawing.Size(120, 35);
         this.btnReadCloud.Click += BtnReadCloud_Click;
         this.tabClient.Controls.Add(this.btnReadCloud);
+
+        // Button: Clear JSON
+        this.btnClearJson = new Button();
+        this.btnClearJson.Text = "Clear JSON";
+        this.btnClearJson.Location = new System.Drawing.Point(230, 300);
+        this.btnClearJson.Size = new System.Drawing.Size(100, 30);
+        this.btnClearJson.UseVisualStyleBackColor = true;
+        this.btnClearJson.Click += new System.EventHandler(this.BtnClearJson_Click);
+        this.tabClient.Controls.Add(this.btnClearJson);
 
         // Label: JSON operation status
         this.lblJsonStatus = new Label();
