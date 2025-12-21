@@ -1014,4 +1014,66 @@ public partial class CosmosExplorerForm : Form
             helper.DatabaseExistsAsync
         );
     }
+    private async void TxtCountItemsInTable_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtCountItemsInDb.Text.Trim();
+        string table = txtCountItemsInTable.Text.Trim();
+        await ValidateTextboxAsync(txtCountItemsInTable, lblCountItemsTableCheck,
+                table => helper.TableExistsAsync(db, table));
+    }
+    private async void BtnCountAllDocsInTable_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        try
+        {
+            btnCountItemsInTable.Enabled = false;
+            btnCountItemsInTable.Text = "Counting...";
+            string dbName = txtCountItemsInDb.Text.Trim();
+            if (string.IsNullOrEmpty(dbName))
+            {
+                MessageBox.Show("Please enter a database name first.",
+                                                    "Input Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            bool dbExists = await helper.DatabaseExistsAsync(dbName);
+            if (!dbExists)
+            {
+                MessageBox.Show($"Database '{dbName}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string tableName = txtCountItemsInTable.Text.Trim();
+            if (string.IsNullOrEmpty(tableName))
+            {
+                MessageBox.Show("Please enter a table name first.",
+                                                    "Input Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            bool tableExists = await helper.TableExistsAsync(dbName,tableName);
+            if (!tableExists)
+            {
+                MessageBox.Show($"Table '{tableName}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo{
+                DbName = dbName,
+                TableName = tableName
+            };
+            int totalItemsInTable = await helper.CountItemsInTableAsync(tableData);
+            lblCountItemsInTableResult.Text = $"Item count in '{tableName}': {totalItemsInTable}";
+        }
+        catch (Exception ex)
+        {
+            lblCountItemsInTableResult.Text = "Request Failed.";
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnCountItemsInTable.Enabled = true;
+            btnCountItemsInTable.Text = "Count Items in table";
+        }
+    }
 }
