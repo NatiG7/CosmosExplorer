@@ -388,17 +388,33 @@ namespace cloudApp
             string tableName = foundTable.TableName;
             return cosmosClient.GetDatabase(dbName).GetContainer(tableName);
         }
-        public async Task<List<string>> GetItemsInTableAsync(string table)
+        public async Task<List<string>> GetItemsInTableAsync(TableInfo tableData)
         {
-            Container? tableContainer = await GetTableAsync(table);
-            if (tableContainer == null) return [];
+            Database db = cosmosClient.GetDatabase(tableData.DbName);
+            Container tableContainer = db.GetContainer(tableData.TableName);
             FeedIterator<JObject> itemIterator = tableContainer.GetItemQueryIterator<JObject>();
             List<JObject> itemList = await ExecuteQueryAsync(itemIterator);
             return itemList.Select(item => item["id"]?.ToString() ?? "Unknown").ToList();
         }
-        public async Task<int> CountItemsInTableAsync(string table)
+        public async Task<int> CountItemsInTableAsync(TableInfo tableData)
         {
-            return (await GetItemsInTableAsync(table)).Count;
+            try
+            {
+                Database db = cosmosClient.GetDatabase(tableData.DbName);
+                Container tableContainer = db.GetContainer(tableData.TableName);
+                QueryDefinition countQuery = new QueryDefinition("SELECT VALUE COUNT(1) FROM c");
+                using FeedIterator<int> iterator = tableContainer.GetItemQueryIterator<int>(countQuery);
+                if (iterator.HasMoreResults)
+                {
+                    FeedResponse<int> iteratorResponse = await iterator.ReadNextAsync();
+                    return iteratorResponse.FirstOrDefault();
+                }
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+            return 0;
         }
         public async Task<int> CountAllItemsAsync()
         {
@@ -406,8 +422,7 @@ namespace cloudApp
             List<TableInfo> allTables = await GetTablesAsync();
             foreach (TableInfo tableData in allTables)
             {
-                string tableName = tableData.TableName;
-                totCount += await CountItemsInTableAsync(tableName);
+                totCount += await CountItemsInTableAsync(tableData);
             }
             return totCount;
         }
