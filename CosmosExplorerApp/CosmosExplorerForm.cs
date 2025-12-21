@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using cloudApp;
 using Newtonsoft.Json.Linq;
+using System.Reflection.Metadata;
 
 public partial class CosmosExplorerForm : Form
 {
@@ -1051,14 +1052,15 @@ public partial class CosmosExplorerForm : Form
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            bool tableExists = await helper.TableExistsAsync(dbName,tableName);
+            bool tableExists = await helper.TableExistsAsync(dbName, tableName);
             if (!tableExists)
             {
                 MessageBox.Show($"Table '{tableName}' was not found.", "Not Found",
                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo{
+            CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
+            {
                 DbName = dbName,
                 TableName = tableName
             };
@@ -1074,6 +1076,63 @@ public partial class CosmosExplorerForm : Form
         {
             btnCountItemsInTable.Enabled = true;
             btnCountItemsInTable.Text = "Count Items in table";
+        }
+    }
+    private void BtnClearReadItemResult_Click(object sender, EventArgs e)
+    {
+        rtbReadItemResult.Clear();
+    }
+    private async void TxtEnterDocumentId_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtCountItemsInDb.Text.Trim();
+        string table = txtCountItemsInTable.Text.Trim();
+        if (string.IsNullOrEmpty(db) || string.IsNullOrEmpty(table))
+        {
+            lblEnterDocumentIdChk.Text = "";
+            return;
+        }
+        await ValidateTextboxAsync(txtEnterDocumentId, lblEnterDocumentIdChk,
+        itemId => helper.ItemExistsAsync(db, table, itemId));
+    }
+    private async void btnEnterDocumentIdReadItem_Click(object sender, EventArgs e)
+    {
+        string db = txtCountItemsInDb.Text.Trim();
+        string table = txtCountItemsInTable.Text.Trim();
+        string itemId = txtEnterDocumentId.Text.Trim();
+        if (string.IsNullOrEmpty(db) || string.IsNullOrEmpty(table) || string.IsNullOrEmpty(itemId))
+        {
+            lblEnterDocumentIdReadItemResults.ForeColor = Color.Orange;
+            lblEnterDocumentIdReadItemResults.Text = "Missing inputs!";
+            return;
+        }
+        try
+        {
+            btnEnterDocumentIdReadItem.Enabled = false;
+            lblEnterDocumentIdReadItemResults.Text = "Reading Item...";
+            JObject? requestedItem = await helper.GetItemFromCosmosAsync(db, table, itemId);
+            if (requestedItem != null)
+            {
+                rtbReadItemResult.Text = requestedItem?.ToString();
+                lblEnterDocumentIdReadItemResults.ForeColor = Color.Green;
+                lblEnterDocumentIdReadItemResults.Text = "Request OK";
+            }
+            else
+            {
+                rtbReadItemResult.Clear();
+                lblEnterDocumentIdReadItemResults.ForeColor = Color.Red;
+                lblEnterDocumentIdReadItemResults.Text = "Item not found (404)";
+            }
+        }
+        catch (Exception ex)
+        {
+            rtbReadItemResult.Clear();
+            lblEnterDocumentIdReadItemResults.ForeColor = Color.Red;
+            lblEnterDocumentIdReadItemResults.Text = "Request failed.";
+            rtbReadItemResult.Text = ex.ToString();
+        }
+        finally
+        {
+            btnEnterDocumentIdReadItem.Enabled = true;
         }
     }
 }

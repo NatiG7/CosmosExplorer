@@ -13,6 +13,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TabPage tabContainers;
     private System.Windows.Forms.TabPage tabDocuments;
     private System.Windows.Forms.TabPage tabClient;
+    private int txtInputWidth = 200;
     private System.Windows.Forms.Label lblEndpoint;
     private System.Windows.Forms.TextBox endpointTxtBox;
     private System.Windows.Forms.Label lblPkey;
@@ -107,6 +108,13 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnCountItemsInTable;
     private System.Windows.Forms.Label lblCountItemsInTable;
     private System.Windows.Forms.Label lblCountItemsInTableResult;
+    private System.Windows.Forms.Label lblEnterDocumentId;
+    private System.Windows.Forms.TextBox txtEnterDocumentId;
+    private System.Windows.Forms.Label lblEnterDocumentIdChk;
+    private System.Windows.Forms.Button btnEnterDocumentIdReadItem;
+    private System.Windows.Forms.Label lblEnterDocumentIdReadItemResults;
+    private System.Windows.Forms.Button btnClearReadItemResult;
+    private System.Windows.Forms.RichTextBox rtbReadItemResult;
 
 
 
@@ -264,7 +272,7 @@ partial class CosmosExplorerForm
         // TextBox: Filter prefix
         this.txtDbPrefix = new System.Windows.Forms.TextBox();
         this.txtDbPrefix.Location = new System.Drawing.Point(210, 405);
-        this.txtDbPrefix.Width = 200;
+        this.txtDbPrefix.Width = txtInputWidth;
         this.tabDatabase.Controls.Add(this.txtDbPrefix);
 
         // Button: Filter DBs
@@ -387,7 +395,7 @@ partial class CosmosExplorerForm
         // TextBox
         this.txtCheckDb = new System.Windows.Forms.TextBox();
         this.txtCheckDb.Location = new System.Drawing.Point(200, 785);
-        this.txtCheckDb.Width = 200;
+        this.txtCheckDb.Width = txtInputWidth;
         this.tabDatabase.Controls.Add(this.txtCheckDb);
 
         // Button
@@ -577,12 +585,12 @@ partial class CosmosExplorerForm
         this.lblCountItemsInDb.AutoSize = true;
         this.lblCountItemsInDb.Location = new System.Drawing.Point(20, 60);
         this.lblCountItemsInDb.Name = "lblCountItemsInDb";
-        this.lblCountItemsInDb.Text = "Count Items in specific DB:";
+        this.lblCountItemsInDb.Text = "Database name: ";
 
         // txtCountItemsInDb
         this.txtCountItemsInDb = new TextBox();
         this.txtCountItemsInDb.Location = new System.Drawing.Point(20, 85);
-        this.txtCountItemsInDb.Width = 200;
+        this.txtCountItemsInDb.Width = txtInputWidth;
         this.txtCountItemsInDb.TextChanged += TxtCountItemsInDb_TextChanged;
 
         // lblCountItemsDbCheck
@@ -611,12 +619,12 @@ partial class CosmosExplorerForm
         this.lblCountItemsInTable.AutoSize = true;
         this.lblCountItemsInTable.Location = new System.Drawing.Point(20, 120);
         this.lblCountItemsInTable.Name = "lblCountItemsInTable";
-        this.lblCountItemsInTable.Text = "Count Items in specific table:";
+        this.lblCountItemsInTable.Text = "Table name: ";
 
         // txtCountItemsInTable
         this.txtCountItemsInTable = new TextBox();
         this.txtCountItemsInTable.Location = new System.Drawing.Point(20, 145);
-        this.txtCountItemsInTable.Width = 200;
+        this.txtCountItemsInTable.Width = txtInputWidth;
         this.txtCountItemsInTable.TextChanged += TxtCountItemsInTable_TextChanged;
 
         // lblCountItemsTableCheck
@@ -640,6 +648,55 @@ partial class CosmosExplorerForm
         this.lblCountItemsInTableResult.Location = new System.Drawing.Point(520, 142);
         this.lblCountItemsInTableResult.Text = "Result: -";
 
+        // lblEnterDocumentId
+        this.lblEnterDocumentId = new Label();
+        this.lblEnterDocumentId.AutoSize = true;
+        this.lblEnterDocumentId.Location = new System.Drawing.Point(20, 180);
+        this.lblEnterDocumentId.Text = "Document Id:";
+        // txtEnterDocumentId
+        this.txtEnterDocumentId = new TextBox();
+        this.txtEnterDocumentId.Location = new System.Drawing.Point(20, 205);
+        this.txtEnterDocumentId.Width = txtInputWidth;
+        this.txtEnterDocumentId.TextChanged += TxtEnterDocumentId_TextChanged;
+
+        // lblEnterDocumentIdChk
+        this.lblEnterDocumentIdChk = new Label();
+        this.lblEnterDocumentIdChk.AutoSize = true;
+        this.lblEnterDocumentIdChk.Location = new System.Drawing.Point(230, 208);
+        this.lblEnterDocumentIdChk.Name = "lblEnterDocumentIdChk";
+        this.lblEnterDocumentIdChk.Text = "";
+        this.lblEnterDocumentIdChk.ForeColor = Color.Green;
+
+        // btnEnterDocumentIdReadItem
+        this.btnEnterDocumentIdReadItem = new Button();
+        this.btnEnterDocumentIdReadItem.Location = new System.Drawing.Point(270, 203);
+        this.btnEnterDocumentIdReadItem.Size = new System.Drawing.Size(180, 35);
+        this.btnEnterDocumentIdReadItem.Text = "Read Document";
+        this.btnEnterDocumentIdReadItem.Click += btnEnterDocumentIdReadItem_Click;
+
+        // lblEnterDocumentIdReadItemResults
+        this.lblEnterDocumentIdReadItemResults = new Label();
+        this.lblEnterDocumentIdReadItemResults.AutoSize = true;
+        this.lblEnterDocumentIdReadItemResults.Location = new System.Drawing.Point(570, 202);
+        this.lblEnterDocumentIdReadItemResults.Text = "Result: -";
+
+        // btnClearReadItemResult
+        this.btnClearReadItemResult = new Button();
+        this.btnClearReadItemResult.Location = new System.Drawing.Point(460, 203);
+        this.btnClearReadItemResult.Size = new System.Drawing.Size(100, 35);
+        this.btnClearReadItemResult.Text = "Clear";
+        this.btnClearReadItemResult.UseVisualStyleBackColor = true;
+        this.btnClearReadItemResult.Click += BtnClearReadItemResult_Click;
+
+        // rtbReadItemResult
+        this.rtbReadItemResult = new RichTextBox();
+        this.rtbReadItemResult.Location = new System.Drawing.Point(20, 250);
+        this.rtbReadItemResult.Name = "rtbReadItemResult";
+        this.rtbReadItemResult.Size = new System.Drawing.Size(550, 400);
+        this.rtbReadItemResult.Text = "";
+        this.rtbReadItemResult.ReadOnly = true;
+        this.rtbReadItemResult.BackColor = System.Drawing.SystemColors.Window;
+
         // -------------------------------------------------------
         // Add to TabPage
         // -------------------------------------------------------
@@ -659,6 +716,15 @@ partial class CosmosExplorerForm
         this.tabDocuments.Controls.Add(this.lblCountItemsTableCheck);
         this.tabDocuments.Controls.Add(this.btnCountItemsInTable);
         this.tabDocuments.Controls.Add(this.lblCountItemsInTableResult);
+        // In document id add ctrls
+        this.tabDocuments.Controls.Add(this.lblEnterDocumentId);
+        this.tabDocuments.Controls.Add(this.txtEnterDocumentId);
+        this.tabDocuments.Controls.Add(this.lblEnterDocumentIdChk);
+        this.tabDocuments.Controls.Add(this.btnEnterDocumentIdReadItem);
+        this.tabDocuments.Controls.Add(this.lblEnterDocumentIdReadItemResults);
+        this.tabDocuments.Controls.Add(this.btnClearReadItemResult);
+        // richtextbox
+        this.tabDocuments.Controls.Add(this.rtbReadItemResult);
 
         #endregion
 
@@ -672,7 +738,7 @@ partial class CosmosExplorerForm
 
         this.txtClientDbName = new TextBox();
         this.txtClientDbName.Location = new System.Drawing.Point(180, 20);
-        this.txtClientDbName.Width = 200;
+        this.txtClientDbName.Width = txtInputWidth;
         this.txtClientDbName.TextChanged += TxtClientDbName_TextChanged;
         this.tabClient.Controls.Add(this.txtClientDbName);
 
@@ -693,7 +759,7 @@ partial class CosmosExplorerForm
 
         this.txtClientTableName = new TextBox();
         this.txtClientTableName.Location = new System.Drawing.Point(180, 60);
-        this.txtClientTableName.Width = 200;
+        this.txtClientTableName.Width = txtInputWidth;
         this.txtClientTableName.TextChanged += TxtClientTableName_TextChanged;
         this.tabClient.Controls.Add(this.txtClientTableName);
 
@@ -722,7 +788,7 @@ partial class CosmosExplorerForm
 
         this.txtClientId = new TextBox();
         this.txtClientId.Location = new System.Drawing.Point(180, 100);
-        this.txtClientId.Width = 200;
+        this.txtClientId.Width = txtInputWidth;
         this.txtClientId.TextChanged += TxtClientId_TextChanged;
         this.tabClient.Controls.Add(this.txtClientId);
 
@@ -735,7 +801,7 @@ partial class CosmosExplorerForm
 
         this.txtClientTz = new TextBox();
         this.txtClientTz.Location = new System.Drawing.Point(180, 140);
-        this.txtClientTz.Width = 200;
+        this.txtClientTz.Width = txtInputWidth;
         this.tabClient.Controls.Add(this.txtClientTz);
 
         // First Name
@@ -747,7 +813,7 @@ partial class CosmosExplorerForm
 
         this.txtClientFirstName = new TextBox();
         this.txtClientFirstName.Location = new System.Drawing.Point(180, 180);
-        this.txtClientFirstName.Width = 200;
+        this.txtClientFirstName.Width = txtInputWidth;
         this.tabClient.Controls.Add(this.txtClientFirstName);
 
         // Last Name
@@ -759,7 +825,7 @@ partial class CosmosExplorerForm
 
         this.txtClientLastName = new TextBox();
         this.txtClientLastName.Location = new System.Drawing.Point(180, 220);
-        this.txtClientLastName.Width = 200;
+        this.txtClientLastName.Width = txtInputWidth;
         this.tabClient.Controls.Add(this.txtClientLastName);
 
         // Save button
