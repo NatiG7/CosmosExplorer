@@ -321,7 +321,7 @@ public partial class CosmosExplorerForm : Form
             if (listTables.Items.Count > 0)
                 listTables.SelectedIndex = 0;
 
-            lblTableCount.Text = $"Tables/Containers: {tables.Count}";
+            lblTableCount.Text = $"Tables / Containers: {tables.Count}";
         }
         catch (Exception ex)
         {
@@ -474,17 +474,16 @@ public partial class CosmosExplorerForm : Form
         {
             if (!validateHelper()) return;
             cmbConditionResults.Items.Clear();
-            if (listDb.Items.Count == 0)
+            List<string> allDbs = await helper.GetDatabasesAsync();
+            if (allDbs.Count == 0)
             {
                 MessageBox.Show("No databases available to apply condition.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            foreach (var dbItem in listDb.Items)
+            foreach (string dbName in allDbs)
             {
-                string dbName = dbItem.ToString() ?? string.Empty;
                 int tableCount = await helper.CountTablesInDBAsync(dbName);
-
                 if (!(dbName.Length % 2 == 0) && (tableCount >= 3 || tableCount == 0))
                 {
                     cmbConditionResults.Items.Add($"{dbName} - Tables: {tableCount}");
@@ -507,7 +506,8 @@ public partial class CosmosExplorerForm : Form
         {
             if (!validateHelper()) return;
             cmbExactTableCountResult.Items.Clear();
-            if (listDb.Items.Count == 0)
+            List<string> allDbs = await helper.GetDatabasesAsync();
+            if (allDbs.Count == 0)
             {
                 MessageBox.Show("No databases available to check table counts.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -520,9 +520,8 @@ public partial class CosmosExplorerForm : Form
                 return;
             }
             List<string> matchingDbs = [];
-            foreach (var dbItem in listDb.Items)
+            foreach (string dbName in allDbs)
             {
-                string? dbName = dbItem.ToString() ?? string.Empty;
                 int tableCount = await helper.CountTablesInDBAsync(dbName);
 
                 if (tableCount == userTableCount)

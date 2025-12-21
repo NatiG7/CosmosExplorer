@@ -32,6 +32,11 @@ namespace cloudApp
             }
             return results;
         }
+        public class TableInfo
+        {
+            public string DbName { get; set; } = string.Empty;
+            public string TableName { get; set; } = string.Empty;
+        }
         // --------------------------------------------------------------------
         // DB + Container Creation
         // --------------------------------------------------------------------
@@ -70,15 +75,19 @@ namespace cloudApp
         // --------------------------------------------------------------------
         // Get all tables in all DBs
         // --------------------------------------------------------------------
-        public async Task<List<string>> GetTablesAsync()
+        public async Task<List<TableInfo>> GetTablesAsync()
         {
-            List<string> allTables = [];
+            List<TableInfo> allTables = [];
             List<string> allDbs = await GetDatabasesAsync();
             foreach (string db in allDbs)
             {
                 List<string> tablesInThisDB = await GetTablesAsync(db);
                 foreach (string table in tablesInThisDB)
-                    allTables.Add($"{db} - {table}");
+                    allTables.Add(new TableInfo
+                    {
+                        DbName = db,
+                        TableName = table
+                    });
             }
             return allTables;
         }
@@ -371,13 +380,13 @@ namespace cloudApp
         }
         public async Task<Container?> GetTableAsync(string table)
         {
-            List<string> allTables = await GetTablesAsync();
-            string? foundTable = allTables.FirstOrDefault(t => t.EndsWith($" - {table}"
-                                                , StringComparison.OrdinalIgnoreCase));
+            List<TableInfo> allTables = await GetTablesAsync();
+            TableInfo? foundTable = allTables.FirstOrDefault(t => t.TableName.Equals(table
+                                                    , StringComparison.OrdinalIgnoreCase));
             if (foundTable == null) return null;
-            string[] parts = foundTable.Split([" - "], StringSplitOptions.None);
-            string dbName = parts[0];
-            return cosmosClient.GetDatabase(dbName).GetContainer(table);
+            string dbName = foundTable.DbName;
+            string tableName = foundTable.TableName;
+            return cosmosClient.GetDatabase(dbName).GetContainer(tableName);
         }
         public async Task<List<string>> GetItemsInTableAsync(string table)
         {
@@ -394,11 +403,10 @@ namespace cloudApp
         public async Task<int> CountAllItemsAsync()
         {
             int totCount = 0;
-            List<string> allTables = await GetTablesAsync();
-            foreach (string table in allTables)
+            List<TableInfo> allTables = await GetTablesAsync();
+            foreach (TableInfo tableData in allTables)
             {
-                string[] parts = table.Split([" - "], StringSplitOptions.None);
-                string tableName = parts[1];
+                string tableName = tableData.TableName;
                 totCount += await CountItemsInTableAsync(tableName);
             }
             return totCount;
