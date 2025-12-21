@@ -97,7 +97,12 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TextBox txtBranches;
     private System.Windows.Forms.Button btnCountAllDocs;
     private System.Windows.Forms.Label lblDocCountResult;
-    
+    private System.Windows.Forms.TextBox txtCountItemsInDb;
+    private System.Windows.Forms.Label lblCountItemsDbCheck;
+    private System.Windows.Forms.Button btnCountItemsInDb;
+    private System.Windows.Forms.Label lblCountItemsInDb;
+    private System.Windows.Forms.Label lblCountItemsInDbResult;
+
 
 
     /// <summary>
@@ -543,35 +548,71 @@ partial class CosmosExplorerForm
 
         #region DocumentsTab
         // ===========================================
-        // ========== DOCUMENTS TAB (EMPTY) ===========
+        // ============= DOCUMENTS TAB ===============
         // ===========================================
 
-        // 
-        // btnCountAllDocs
-        // 
-        this.btnCountAllDocs = new System.Windows.Forms.Button();
-        this.btnCountAllDocs.Location = new System.Drawing.Point(20, 30);
+        // Button: Count ALL
+        this.btnCountAllDocs = new Button();
+        this.btnCountAllDocs.Location = new System.Drawing.Point(20, 20);
         this.btnCountAllDocs.Name = "btnCountAllDocs";
-        this.btnCountAllDocs.Size = new System.Drawing.Size(200, 40);
+        this.btnCountAllDocs.Size = new System.Drawing.Size(180, 35);
         this.btnCountAllDocs.Text = "Count ALL Items (Global)";
+        this.btnCountAllDocs.UseVisualStyleBackColor = true;
         this.btnCountAllDocs.UseVisualStyleBackColor = true;
         this.btnCountAllDocs.Click += new System.EventHandler(this.BtnCountAllDocs_Click);
 
-        // 
-        // lblDocCountResult
-        // 
-        this.lblDocCountResult = new System.Windows.Forms.Label();
+        // Label: Global Result
+        this.lblDocCountResult = new Label();
         this.lblDocCountResult.AutoSize = true;
-        this.lblDocCountResult.Location = new System.Drawing.Point(240, 38);
+        this.lblDocCountResult.Location = new System.Drawing.Point(220, 28);
         this.lblDocCountResult.Name = "lblDocCountResult";
-        this.lblDocCountResult.Size = new System.Drawing.Size(110, 21);
         this.lblDocCountResult.Text = "Total Items: -";
 
-        // 
+        // Label: Instruction
+        this.lblCountItemsInDb = new Label();
+        this.lblCountItemsInDb.AutoSize = true;
+        this.lblCountItemsInDb.Location = new System.Drawing.Point(20, 60);
+        this.lblCountItemsInDb.Name = "lblCountItemsInDb";
+        this.lblCountItemsInDb.Text = "Count Items in specific DB:";
+
+        // TextBox: Input
+        this.txtCountItemsInDb = new TextBox();
+        this.txtCountItemsInDb.Location = new System.Drawing.Point(20, 85);
+        this.txtCountItemsInDb.Width = 200;
+        this.txtCountItemsInDb.TextChanged += TxtCountItemsInDb_TextChanged;
+
+        // Label: Green Checkmark
+        this.lblCountItemsDbCheck = new Label();
+        this.lblCountItemsDbCheck.AutoSize = true;
+        this.lblCountItemsDbCheck.Location = new System.Drawing.Point(230, 88);
+        this.lblCountItemsDbCheck.Name = "lblCountItemsDbCheck";
+        this.lblCountItemsDbCheck.Text = "";
+        this.lblCountItemsDbCheck.ForeColor = Color.Green;
+
+        // Button: Action
+        this.btnCountItemsInDb = new Button();
+        this.btnCountItemsInDb.Location = new System.Drawing.Point(270, 83);
+        this.btnCountItemsInDb.Size = new System.Drawing.Size(180, 35);
+        this.btnCountItemsInDb.Text = "Count Items in DB";
+        this.btnCountItemsInDb.Click += this.BtnCountAllDocsInDb_Click;
+
+        // Label: Specific Result
+        this.lblCountItemsInDbResult = new Label();
+        this.lblCountItemsInDbResult.AutoSize = true;
+        this.lblCountItemsInDbResult.Location = new System.Drawing.Point(520, 88);
+        this.lblCountItemsInDbResult.Text = "Result: -";
+
+        // -------------------------------------------------------
         // Add to TabPage
-        // 
+        // -------------------------------------------------------
         this.tabDocuments.Controls.Add(this.btnCountAllDocs);
         this.tabDocuments.Controls.Add(this.lblDocCountResult);
+
+        this.tabDocuments.Controls.Add(this.lblCountItemsInDb);
+        this.tabDocuments.Controls.Add(this.txtCountItemsInDb);
+        this.tabDocuments.Controls.Add(this.lblCountItemsDbCheck);
+        this.tabDocuments.Controls.Add(this.btnCountItemsInDb);
+        this.tabDocuments.Controls.Add(this.lblCountItemsInDbResult);
 
         #endregion
 

@@ -960,4 +960,58 @@ public partial class CosmosExplorerForm : Form
             btnCountAllDocs.Text = "Count ALL Items (Global)";
         }
     }
+    private async void BtnCountAllDocsInDb_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        try
+        {
+            btnCountItemsInDb.Enabled = false;
+            btnCountItemsInDb.Text = "Counting...";
+            string dbName = txtCountItemsInDb.Text.Trim();
+            if (string.IsNullOrEmpty(dbName))
+            {
+                MessageBox.Show("Please enter a database name first.",
+                                                    "Input Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            bool exists = await helper.DatabaseExistsAsync(dbName);
+            if (!exists)
+            {
+                MessageBox.Show($"Database '{dbName}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            List<string> tableNames = await helper.GetTablesAsync(dbName);
+            int totalItemCount = 0;
+            foreach (string tableName in tableNames)
+            {
+                CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
+                {
+                    DbName = dbName,
+                    TableName = tableName
+                };
+                totalItemCount += await helper.CountItemsInTableAsync(tableData);
+            }
+            lblCountItemsInDbResult.Text = $"Items in {dbName} : {totalItemCount}";
+        }
+        catch (Exception ex)
+        {
+            lblCountItemsInDbResult.Text = "Request Failed.";
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnCountItemsInDb.Enabled = true;
+            btnCountItemsInDb.Text = "Count Items in DB";
+        }
+    }
+    private async void TxtCountItemsInDb_TextChanged(object sender, EventArgs e)
+    {
+        await ValidateTextboxAsync(
+            txtCountItemsInDb,
+            lblCountItemsDbCheck,
+            helper.DatabaseExistsAsync
+        );
+    }
 }
