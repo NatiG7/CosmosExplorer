@@ -1081,6 +1081,7 @@ public partial class CosmosExplorerForm : Form
     private void BtnClearReadItemResult_Click(object sender, EventArgs e)
     {
         rtbReadItemResult.Clear();
+        txtEnterDocumentId.Clear();
     }
     private async void TxtEnterDocumentId_TextChanged(object sender, EventArgs e)
     {
