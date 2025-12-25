@@ -9,7 +9,7 @@ using System.Reflection.Metadata;
 
 public partial class CosmosExplorerForm : Form
 {
-    private CosmosHelper helper;
+    private CosmosHelper helper = null!;
     private CosmosClient? _client;
     public CosmosExplorerForm()
     {
