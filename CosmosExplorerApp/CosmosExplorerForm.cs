@@ -1136,4 +1136,165 @@ public partial class CosmosExplorerForm : Form
             btnEnterDocumentIdReadItem.Enabled = true;
         }
     }
+    private async void TxtInvDb_TextChanged(object sender, EventArgs e)
+    {
+        await ValidateTextboxAsync(
+            txtInvDb,
+            lblInvDbCheck,
+            helper.DatabaseExistsAsync
+        );
+    }
+    private async void TxtInvTable_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtInvDb.Text.Trim();
+        if (string.IsNullOrEmpty(db))
+        {
+            lblInvTableCheck.Text = "";
+            return;
+        }
+        await ValidateTextboxAsync(
+            txtInvTable,
+            lblInvTableCheck,
+            (tableName) => helper.TableExistsAsync(db, tableName)
+        );
+    }
+    private async void TxtInvDocId_TextChanged(object sender, EventArgs e)
+    {
+        string db = txtInvDb.Text.Trim();
+        string table = txtInvTable.Text.Trim();
+        if (string.IsNullOrEmpty(db) || string.IsNullOrEmpty(table))
+        {
+            lblInvDocIdCheck.Text = "";
+            return;
+        }
+        await ValidateTextboxAsync(
+            txtInvDocId,
+            lblInvDocIdCheck,
+            (docId) => helper.ItemExistsAsync(db, table, docId)
+        );
+    }
+    // private async Task<bool> ValidateInputAndExistsAsync(string val, string context, Func<Task<bool>>)
+    private async void BtnInvestigate_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        try
+        {
+            btnInvestigate.Enabled = false;
+            btnInvestigate.Text = "Investigating...";
+            string db = txtInvDb.Text.Trim();
+            string tableName = txtInvTable.Text.Trim();
+            string docId = txtInvDocId.Text.Trim();
+            // #####TODO#######
+            // private async Task<bool> ValidateInputAndExistsAsync(string value, string context,Func<Task<bool>> ifExists)
+            // function receives a string value and context name (table/db etc, for messages) and runs a function that returns bool
+            if (string.IsNullOrEmpty(db))
+            {
+                MessageBox.Show("Please enter a database name first.",
+                                                    "Input Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            bool dbExists = await helper.DatabaseExistsAsync(db);
+            if (!dbExists)
+            {
+                MessageBox.Show($"Database '{db}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (string.IsNullOrEmpty(tableName))
+            {
+                MessageBox.Show("Please enter a table name first.",
+                                                    "Input Required",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            bool tableExists = await helper.TableExistsAsync(db, tableName);
+            if (!tableExists)
+            {
+                MessageBox.Show($"Table '{tableName}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
+            {
+                DbName = db,
+                TableName = tableName
+            };
+            bool itemExists = await helper.ItemExistsAsync(db, tableName, docId);
+            if (!itemExists)
+            {
+                MessageBox.Show($"Item with id '{docId}' was not found.", "Not Found",
+                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            JObject? thisDoc = await helper.GetItemFromCosmosAsync(tableData.DbName,
+                                                        tableData.TableName, docId);
+            // fieldName
+            string fieldNameOne = txtInvFieldName1.Text.Trim();
+            string fieldNameTwo = txtInvFieldName2.Text.Trim();
+            string fieldNameThree = txtInvFieldName3.Text.Trim();
+            List<string> fieldsInvestigate = [fieldNameOne, fieldNameTwo, fieldNameThree];
+            // fieldValue
+            string fieldOneValue = txtInvFieldValue1.Text.Trim();
+            string fieldTwoValue = txtInvFieldValue2.Text.Trim();
+            string fieldThreeValue = txtInvFieldValue3.Text.Trim();
+            List<string> fieldsInvestigateValues = [fieldOneValue, fieldTwoValue, fieldThreeValue];
+            List<string> fieldResults = [];
+            bool isMatch = true;
+            if (thisDoc != null)
+            {
+                for (int i = 0; i < fieldsInvestigate.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(fieldsInvestigate[i])) continue;
+                    JToken? thisDocField = thisDoc[fieldsInvestigate[i]];
+                    if (thisDocField != null)
+                    {
+                        if (thisDocField.ToString() != fieldsInvestigateValues[i])
+                        {
+                            isMatch = false;
+                            fieldResults.Add($"Field {fieldsInvestigate[i]} value mismatch!");
+                        }
+                        else
+                        {
+                            fieldResults.Add($"Field {fieldsInvestigate[i]} exists\n\tValue: {fieldsInvestigateValues[i]}");
+                        }
+                    }
+                    else
+                    {
+                        isMatch = false;
+                        fieldResults.Add($"Field {fieldsInvestigate[i]} does not exist!");
+                    }
+                }
+                rtbInvResult.Text = string.Join(Environment.NewLine, fieldResults) +
+                                    Environment.NewLine +
+                                    "------------------------------" +
+                                    Environment.NewLine +
+                                    thisDoc.ToString();
+                if (isMatch)
+                {
+                    lblInvResult.Text = "Match Confirmed!";
+                    lblInvResult.ForeColor = Color.Green;
+                }
+                else
+                {
+                    lblInvResult.Text = "Issues Found";
+                    lblInvResult.ForeColor = Color.Red;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            lblInvResult.Text = "Request Failed.";
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnInvestigate.Enabled = true;
+            btnInvestigate.Text = "Investigate Document";
+        }
+    }
+    private void BtnClearInvestigateResult(object sender, EventArgs e)
+    {
+        rtbInvResult.Clear();
+    }
 }

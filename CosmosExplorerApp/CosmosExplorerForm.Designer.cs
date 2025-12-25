@@ -12,6 +12,7 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.TabPage tabDatabase;
     private System.Windows.Forms.TabPage tabContainers;
     private System.Windows.Forms.TabPage tabDocuments;
+    private System.Windows.Forms.TabPage tabInvestigation;
     private System.Windows.Forms.TabPage tabClient;
     private int txtInputWidth = 200;
     private System.Windows.Forms.Label lblEndpoint;
@@ -115,6 +116,25 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Label lblEnterDocumentIdReadItemResults;
     private System.Windows.Forms.Button btnClearReadItemResult;
     private System.Windows.Forms.RichTextBox rtbReadItemResult;
+    private System.Windows.Forms.Label lblInvDb;
+    private System.Windows.Forms.TextBox txtInvDb;
+    private System.Windows.Forms.Label lblInvTable;
+    private System.Windows.Forms.TextBox txtInvTable;
+    private System.Windows.Forms.Label lblInvDocId;
+    private System.Windows.Forms.TextBox txtInvDocId;
+    private System.Windows.Forms.Label lblInvDbCheck;
+    private System.Windows.Forms.Label lblInvTableCheck;
+    private System.Windows.Forms.Label lblInvDocIdCheck;
+    private System.Windows.Forms.Label lblInvConditions;
+    private System.Windows.Forms.TextBox txtInvFieldName1;
+    private System.Windows.Forms.TextBox txtInvFieldValue1;
+    private System.Windows.Forms.TextBox txtInvFieldName2;
+    private System.Windows.Forms.TextBox txtInvFieldValue2;
+    private System.Windows.Forms.TextBox txtInvFieldName3;
+    private System.Windows.Forms.TextBox txtInvFieldValue3;
+    private System.Windows.Forms.Button btnInvestigate;
+    private System.Windows.Forms.Label lblInvResult;
+    private System.Windows.Forms.RichTextBox rtbInvResult;
 
 
 
@@ -154,6 +174,7 @@ partial class CosmosExplorerForm
         this.tabDatabase = new System.Windows.Forms.TabPage();
         this.tabContainers = new System.Windows.Forms.TabPage();
         this.tabDocuments = new System.Windows.Forms.TabPage();
+        this.tabInvestigation = new System.Windows.Forms.TabPage();
         this.tabClient = new System.Windows.Forms.TabPage();
 
         this.tabControl1.Location = new System.Drawing.Point(10, 10);
@@ -162,11 +183,13 @@ partial class CosmosExplorerForm
         this.tabDatabase.Text = "Databases";
         this.tabContainers.Text = "Containers";
         this.tabDocuments.Text = "Documents";
+        this.tabInvestigation.Text = "Investigate";
         this.tabClient.Text = "Client / Student Info";
 
         this.tabControl1.Controls.Add(this.tabDatabase);
         this.tabControl1.Controls.Add(this.tabContainers);
         this.tabControl1.Controls.Add(this.tabDocuments);
+        this.tabControl1.Controls.Add(this.tabInvestigation);
         this.tabControl1.Controls.Add(this.tabClient);
 
         this.Controls.Add(this.tabControl1);
@@ -674,12 +697,6 @@ partial class CosmosExplorerForm
         this.btnEnterDocumentIdReadItem.Text = "Read Document";
         this.btnEnterDocumentIdReadItem.Click += btnEnterDocumentIdReadItem_Click;
 
-        // lblEnterDocumentIdReadItemResults
-        this.lblEnterDocumentIdReadItemResults = new Label();
-        this.lblEnterDocumentIdReadItemResults.AutoSize = true;
-        this.lblEnterDocumentIdReadItemResults.Location = new System.Drawing.Point(570, 202);
-        this.lblEnterDocumentIdReadItemResults.Text = "Result: -";
-
         // btnClearReadItemResult
         this.btnClearReadItemResult = new Button();
         this.btnClearReadItemResult.Location = new System.Drawing.Point(460, 203);
@@ -687,6 +704,12 @@ partial class CosmosExplorerForm
         this.btnClearReadItemResult.Text = "Clear";
         this.btnClearReadItemResult.UseVisualStyleBackColor = true;
         this.btnClearReadItemResult.Click += BtnClearReadItemResult_Click;
+
+        // lblEnterDocumentIdReadItemResults
+        this.lblEnterDocumentIdReadItemResults = new Label();
+        this.lblEnterDocumentIdReadItemResults.AutoSize = true;
+        this.lblEnterDocumentIdReadItemResults.Location = new System.Drawing.Point(570, 202);
+        this.lblEnterDocumentIdReadItemResults.Text = "Result: -";
 
         // rtbReadItemResult
         this.rtbReadItemResult = new RichTextBox();
@@ -727,6 +750,157 @@ partial class CosmosExplorerForm
         this.tabDocuments.Controls.Add(this.rtbReadItemResult);
 
         #endregion
+
+        #region Investigate Document
+        // left side target
+
+        // lblInvDb
+        this.lblInvDb = new System.Windows.Forms.Label();
+        this.lblInvDb.AutoSize = true;
+        this.lblInvDb.Location = new System.Drawing.Point(20, 20);
+        this.lblInvDb.Text = "Database:";
+
+        // txtInvDb
+        this.txtInvDb = new System.Windows.Forms.TextBox();
+        this.txtInvDb.Location = new System.Drawing.Point(20, 45);
+        this.txtInvDb.Width = 200;
+        this.txtInvDb.TextChanged += TxtInvDb_TextChanged;
+
+        // db_check
+        this.lblInvDbCheck = new System.Windows.Forms.Label();
+        this.lblInvDbCheck.AutoSize = true;
+        this.lblInvDbCheck.Location = new System.Drawing.Point(230, 48); // aligned with txtInvDb
+        this.lblInvDbCheck.Text = "";
+        this.lblInvDbCheck.ForeColor = System.Drawing.Color.Green;
+
+        // lblInvTable
+        this.lblInvTable = new System.Windows.Forms.Label();
+        this.lblInvTable.AutoSize = true;
+        this.lblInvTable.Location = new System.Drawing.Point(20, 80);
+        this.lblInvTable.Text = "Table / Container:";
+
+        // txtInvTable
+        this.txtInvTable = new System.Windows.Forms.TextBox();
+        this.txtInvTable.Location = new System.Drawing.Point(20, 105);
+        this.txtInvTable.Width = 200;
+        this.txtInvTable.TextChanged += TxtInvTable_TextChanged;
+
+        // table_check
+        this.lblInvTableCheck = new System.Windows.Forms.Label();
+        this.lblInvTableCheck.AutoSize = true;
+        this.lblInvTableCheck.Location = new System.Drawing.Point(230, 108); // aligned with txtInvTable
+        this.lblInvTableCheck.Text = "";
+        this.lblInvTableCheck.ForeColor = System.Drawing.Color.Green;
+
+        // lblInvDocId
+        this.lblInvDocId = new System.Windows.Forms.Label();
+        this.lblInvDocId.AutoSize = true;
+        this.lblInvDocId.Location = new System.Drawing.Point(20, 140);
+        this.lblInvDocId.Text = "Document ID (Required):";
+
+        // txtInvDocId
+        this.txtInvDocId = new System.Windows.Forms.TextBox();
+        this.txtInvDocId.Location = new System.Drawing.Point(20, 165);
+        this.txtInvDocId.Width = 200;
+        this.txtInvDocId.TextChanged += TxtInvDocId_TextChanged;
+
+        // docId_check
+        this.lblInvDocIdCheck = new System.Windows.Forms.Label();
+        this.lblInvDocIdCheck.AutoSize = true;
+        this.lblInvDocIdCheck.Location = new System.Drawing.Point(230, 168); // aligned with txtInvDocId
+        this.lblInvDocIdCheck.Text = "";
+        this.lblInvDocIdCheck.ForeColor = System.Drawing.Color.Green;
+
+        // right side conditions
+        int col2X = 300; // alignment
+
+        this.lblInvConditions = new System.Windows.Forms.Label();
+        this.lblInvConditions.AutoSize = true;
+        this.lblInvConditions.Location = new System.Drawing.Point(col2X, 20);
+        this.lblInvConditions.Text = "Field Constraints (Name = Value)";
+        this.lblInvConditions.Font = new System.Drawing.Font(this.Font, System.Drawing.FontStyle.Bold);
+
+        // txtInvFieldName1
+        this.txtInvFieldName1 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldName1.Location = new System.Drawing.Point(col2X, 45);
+        this.txtInvFieldName1.Width = 150;
+        this.txtInvFieldName1.PlaceholderText = "Field Name 1";
+
+        // txtInvFieldValue1
+        this.txtInvFieldValue1 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldValue1.Location = new System.Drawing.Point(col2X + 160, 45);
+        this.txtInvFieldValue1.Width = 150;
+        this.txtInvFieldValue1.PlaceholderText = "Value 1";
+
+        // txtInvFieldName2
+        this.txtInvFieldName2 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldName2.Location = new System.Drawing.Point(col2X, 80);
+        this.txtInvFieldName2.Width = 150;
+        this.txtInvFieldName2.PlaceholderText = "Field Name 2";
+
+        // txtInvFieldValue2
+        this.txtInvFieldValue2 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldValue2.Location = new System.Drawing.Point(col2X + 160, 80);
+        this.txtInvFieldValue2.Width = 150;
+        this.txtInvFieldValue2.PlaceholderText = "Value 2";
+
+        // txtInvFieldName3
+        this.txtInvFieldName3 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldName3.Location = new System.Drawing.Point(col2X, 115);
+        this.txtInvFieldName3.Width = 150;
+        this.txtInvFieldName3.PlaceholderText = "Field Name 3";
+
+        // txtInvFieldValue3
+        this.txtInvFieldValue3 = new System.Windows.Forms.TextBox();
+        this.txtInvFieldValue3.Location = new System.Drawing.Point(col2X + 160, 115);
+        this.txtInvFieldValue3.Width = 150;
+        this.txtInvFieldValue3.PlaceholderText = "Value 3";
+
+        // btnInvestigate
+        this.btnInvestigate = new System.Windows.Forms.Button();
+        this.btnInvestigate.Text = "Investigate Document";
+        this.btnInvestigate.Location = new System.Drawing.Point(20, 220);
+        this.btnInvestigate.Size = new System.Drawing.Size(200, 40);
+        this.btnInvestigate.UseVisualStyleBackColor = true;
+        this.btnInvestigate.Click += BtnInvestigate_Click;
+
+        // lblInvResult
+        this.lblInvResult = new System.Windows.Forms.Label();
+        this.lblInvResult.Text = "Status: Waiting...";
+        this.lblInvResult.Location = new System.Drawing.Point(240, 230);
+        this.lblInvResult.AutoSize = true;
+
+        // rtbInvResult
+        this.rtbInvResult = new System.Windows.Forms.RichTextBox();
+        this.rtbInvResult.Location = new System.Drawing.Point(20, 280);
+        this.rtbInvResult.Size = new System.Drawing.Size(600, 400);
+        this.rtbInvResult.ReadOnly = true;
+        this.rtbInvResult.BackColor = System.Drawing.SystemColors.Window;
+
+        // Add controls
+        this.tabInvestigation.Controls.Add(this.lblInvDb);
+        this.tabInvestigation.Controls.Add(this.txtInvDb);
+        this.tabInvestigation.Controls.Add(this.lblInvDbCheck);
+        this.tabInvestigation.Controls.Add(this.lblInvTable);
+        this.tabInvestigation.Controls.Add(this.txtInvTable);
+        this.tabInvestigation.Controls.Add(this.lblInvTableCheck);
+        this.tabInvestigation.Controls.Add(this.lblInvDocId);
+        this.tabInvestigation.Controls.Add(this.txtInvDocId);
+        this.tabInvestigation.Controls.Add(this.lblInvDocIdCheck);
+
+        this.tabInvestigation.Controls.Add(this.lblInvConditions);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldName1);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldValue1);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldName2);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldValue2);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldName3);
+        this.tabInvestigation.Controls.Add(this.txtInvFieldValue3);
+
+        this.tabInvestigation.Controls.Add(this.btnInvestigate);
+        this.tabInvestigation.Controls.Add(this.lblInvResult);
+        this.tabInvestigation.Controls.Add(this.rtbInvResult);
+
+        # endregion
 
         #region Client/Student Info
         // Database name
