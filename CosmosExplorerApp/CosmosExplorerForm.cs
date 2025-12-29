@@ -1173,7 +1173,25 @@ public partial class CosmosExplorerForm : Form
             (docId) => helper.ItemExistsAsync(db, table, docId)
         );
     }
-    // private async Task<bool> ValidateInputAndExistsAsync(string val, string context, Func<Task<bool>>)
+    private async Task<bool> ValidateInputAndExistsAsync(string val, string context, Func<Task<bool>> isExists)
+    {
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                MessageBox.Show($"Please enter a {contextName} first.", "Input Required",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            bool exists = await existenceCheck();
+            if (!exists)
+            {
+                MessageBox.Show($"{contextName} '{value}' was not found.", "Not Found",
+                                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
+    }
     private async void BtnInvestigate_Click(object sender, EventArgs e)
     {
         if (!validateHelper()) return;
@@ -1184,51 +1202,22 @@ public partial class CosmosExplorerForm : Form
             string db = txtInvDb.Text.Trim();
             string tableName = txtInvTable.Text.Trim();
             string docId = txtInvDocId.Text.Trim();
-            // #####TODO#######
-            // private async Task<bool> ValidateInputAndExistsAsync(string value, string context,Func<Task<bool>> ifExists)
-            // function receives a string value and context name (table/db etc, for messages) and runs a function that returns bool
-            if (string.IsNullOrEmpty(db))
-            {
-                MessageBox.Show("Please enter a database name first.",
-                                                    "Input Required",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            bool dbExists = await helper.DatabaseExistsAsync(db);
-            if (!dbExists)
-            {
-                MessageBox.Show($"Database '{db}' was not found.", "Not Found",
-                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (string.IsNullOrEmpty(tableName))
-            {
-                MessageBox.Show("Please enter a table name first.",
-                                                    "Input Required",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            bool tableExists = await helper.TableExistsAsync(db, tableName);
-            if (!tableExists)
-            {
-                MessageBox.Show($"Table '{tableName}' was not found.", "Not Found",
-                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (!await ValidateInputAndExistsAsync(db, "Database", () => helper.DatabaseExistsAsync(db))) return;
+            if (!await ValidateInputAndExistsAsync(tableName, "Table", () => helper.TableExistsAsync(db, tableName))) return;
             CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
             {
                 DbName = db,
                 TableName = tableName
             };
-            bool itemExists = await helper.ItemExistsAsync(db, tableName, docId);
-            if (!itemExists)
-            {
-                MessageBox.Show($"Item with id '{docId}' was not found.", "Not Found",
-                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (!await ValidateInputAndExistsAsync(docId, "Document", () => helper.ItemExistsAsync(tableData.DbName, tableData.TableName, docId))) return;
             JObject? thisDoc = await helper.GetItemFromCosmosAsync(tableData.DbName,
                                                         tableData.TableName, docId);
+            if (chkCountCourses.Checked)
+            {
+                string courseOutput = FetchStudentCourses(thisDoc);
+                txtCourseResult.Text = courseOutput;
+            }
+            else txtCourseResult.Text = "No Courses";
             // fieldName
             string fieldNameOne = txtInvFieldName1.Text.Trim();
             string fieldNameTwo = txtInvFieldName2.Text.Trim();
@@ -1292,6 +1281,26 @@ public partial class CosmosExplorerForm : Form
             btnInvestigate.Enabled = true;
             btnInvestigate.Text = "Investigate Document";
         }
+    }
+    private string FetchStudentCourses(JObject? document)
+    {
+        if (document == null) return "Error reading document.";
+        try
+        {
+            JToken thisDocCourses = document["courses"];
+            if (thisDocCourses is JArray coursesArray)
+            {
+                int validCount = 0;
+                foreach (JToken item in coursesArray)
+                {
+                    if (item != null && item.Type != JTokenType.Null) validCount++;
+                }
+                return validCount.ToString();
+            }
+        }
+        catch (Exception)
+        { }
+        return "No Courses";
     }
     private void BtnClearInvestigateResult(object sender, EventArgs e)
     {

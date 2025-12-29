@@ -135,6 +135,8 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.Button btnInvestigate;
     private System.Windows.Forms.Label lblInvResult;
     private System.Windows.Forms.RichTextBox rtbInvResult;
+    private System.Windows.Forms.CheckBox chkCountCourses;
+    private System.Windows.Forms.TextBox txtCourseResult;
 
 
 
@@ -876,6 +878,20 @@ partial class CosmosExplorerForm
         this.rtbInvResult.Size = new System.Drawing.Size(600, 400);
         this.rtbInvResult.ReadOnly = true;
         this.rtbInvResult.BackColor = System.Drawing.SystemColors.Window;
+        
+        // chkCountCourses
+        this.chkCountCourses = new System.Windows.Forms.CheckBox();
+        this.chkCountCourses.AutoSize = true;
+        this.chkCountCourses.Location = new System.Drawing.Point(230, 228);
+        this.chkCountCourses.Text = "Count Student Courses";
+        this.chkCountCourses.UseVisualStyleBackColor = true;
+
+        // txtCourseResult
+        this.txtCourseResult = new System.Windows.Forms.TextBox();
+        this.txtCourseResult.Location = new System.Drawing.Point(380, 225);
+        this.txtCourseResult.Width = 120;
+        this.txtCourseResult.ReadOnly = true;
+        this.txtCourseResult.Text = "No Courses.";
 
         // Add controls
         this.tabInvestigation.Controls.Add(this.lblInvDb);
@@ -899,6 +915,9 @@ partial class CosmosExplorerForm
         this.tabInvestigation.Controls.Add(this.btnInvestigate);
         this.tabInvestigation.Controls.Add(this.lblInvResult);
         this.tabInvestigation.Controls.Add(this.rtbInvResult);
+
+        this.tabInvestigation.Controls.Add(this.chkCountCourses);
+        this.tabInvestigation.Controls.Add(this.txtCourseResult);
 
         # endregion
 
