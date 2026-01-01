@@ -1176,16 +1176,16 @@ public partial class CosmosExplorerForm : Form
     private async Task<bool> ValidateInputAndExistsAsync(string val, string context, Func<Task<bool>> isExists)
     {
         {
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(val))
             {
-                MessageBox.Show($"Please enter a {contextName} first.", "Input Required",
+                MessageBox.Show($"Please enter a {context} first.", "Input Required",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
-            bool exists = await existenceCheck();
+            bool exists = await isExists();
             if (!exists)
             {
-                MessageBox.Show($"{contextName} '{value}' was not found.", "Not Found",
+                MessageBox.Show($"{context} '{val}' was not found.", "Not Found",
                                 MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
@@ -1287,7 +1287,7 @@ public partial class CosmosExplorerForm : Form
         if (document == null) return "Error reading document.";
         try
         {
-            JToken thisDocCourses = document["courses"];
+            JToken? thisDocCourses = document["courses"];
             if (thisDocCourses is JArray coursesArray)
             {
                 int validCount = 0;
@@ -1295,7 +1295,7 @@ public partial class CosmosExplorerForm : Form
                 {
                     if (item != null && item.Type != JTokenType.Null) validCount++;
                 }
-                return validCount.ToString();
+                return "Number of coursers: " + validCount.ToString();
             }
         }
         catch (Exception)

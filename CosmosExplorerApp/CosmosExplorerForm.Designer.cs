@@ -874,7 +874,7 @@ partial class CosmosExplorerForm
 
         // rtbInvResult
         this.rtbInvResult = new System.Windows.Forms.RichTextBox();
-        this.rtbInvResult.Location = new System.Drawing.Point(20, 280);
+        this.rtbInvResult.Location = new System.Drawing.Point(20, 310);
         this.rtbInvResult.Size = new System.Drawing.Size(600, 400);
         this.rtbInvResult.ReadOnly = true;
         this.rtbInvResult.BackColor = System.Drawing.SystemColors.Window;
@@ -882,14 +882,14 @@ partial class CosmosExplorerForm
         // chkCountCourses
         this.chkCountCourses = new System.Windows.Forms.CheckBox();
         this.chkCountCourses.AutoSize = true;
-        this.chkCountCourses.Location = new System.Drawing.Point(230, 228);
+        this.chkCountCourses.Location = new System.Drawing.Point(20, 270);
         this.chkCountCourses.Text = "Count Student Courses";
         this.chkCountCourses.UseVisualStyleBackColor = true;
 
         // txtCourseResult
         this.txtCourseResult = new System.Windows.Forms.TextBox();
-        this.txtCourseResult.Location = new System.Drawing.Point(380, 225);
-        this.txtCourseResult.Width = 120;
+        this.txtCourseResult.Location = new System.Drawing.Point(200, 268);
+        this.txtCourseResult.Width = 135;
         this.txtCourseResult.ReadOnly = true;
         this.txtCourseResult.Text = "No Courses.";
 
