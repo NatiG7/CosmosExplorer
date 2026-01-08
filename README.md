@@ -1,61 +1,115 @@
-# Cosmos Explorer App
+# 🌌 Cosmos Explorer App
 
-A Windows Forms app to explore and manage Azure Cosmos DB databases, containers, and documents.
+A comprehensive Windows Forms application built with **.NET** to explore, manage, and audit Azure Cosmos DB resources. This tool goes beyond simple CRUD, offering advanced filtering, data integrity investigation, and batch operations for JSON data.
 
-## Features
+![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey) ![.NET](https://img.shields.io/badge/.NET-10.0-purple)
 
-- **Load Cosmos DB Keys**
+## 🚀 Features
 
-  - Enter your Endpoint URI and Primary Key
-  - Click **Load Keys** to connect.Displays connection speed (latency) after loading.
-- **Database Management**
+### 🔌 Connection & Diagnostics
 
-  - View all databases in the **Databases** tab.
-  - Create new databases by entering a name and clicking **Create Database**.
-  - Refresh database list.
-  - Count total databases using the **DB Count** button next to the list.
-- **Container / Table Management**
+* **Secure Auth**: Connect via Endpoint URI and Primary Key (loadable via `App.config` or manual entry).
+* **Latency Check**: Automatically measures and displays connection latency (ms) upon connecting.
+* **Real-time Logging**: 
+    * **UI Log**: Scrollable activity feed at the bottom of the application.
+    * **File Log**: Automatic log file rotation (e.g., `log_1.txt`, `log_2.txt`) in the `./Logs/` directory.
 
-  - Switch to the **Containers** tab.
-  - Select a database from the dropdown to view its containers (tables).
-  - Create new containers by entering a name and clicking **Create Container**.
-  - Refresh container list with **Refresh Tables** button.
-  - Container creation shows a confirmation message.
-- **Document Management**
+### 🗄️ Database Management
 
-  - (Future tab for documents, not yet implemented.)
+* **CRUD**: Create new databases and list existing ones.
+* **Advanced Analytics & Filtering**:
+    * **Count**: Total databases and table counts per database.
+    * **Search**: Filter DBs by prefix.
+    * **Cross-Reference**: Find databases that contain tables with specific naming patterns.
+    * **Logic Filters**: Specialized filters for "Longest DB Names" or complex conditions (e.g., odd-length names with specific table counts).
+    * **Existence Check**: Quick "Green/Red" visual check to see if a specific DB exists.
 
-## Screenshots
+### 📦 Container (Table) Operations
 
-### Databases Tab
+* **Management**: Create new containers within selected databases.
+* **Global Table Search**: Search for a specific table name across *all* databases in the account.
+* **Name Filtering**: Filter tables based on character length.
+* **Stats**: View table counts for specific DBs or the entire account.
 
-![Databases Tab][dbtab]
+### 🕵️ Investigation Module
 
-### Containers Tab
+A dedicated tab for data integrity and auditing:
 
-![Containers Tab][ctab]
+* **Target Verification**: Validates the existence of Database, Table, and Document ID with visual status indicators.
+* **Field Matching**: Validate up to 3 specific fields (Key/Value pairs) within a document to ensure data consistency.
+* **Content logic**: Specifically parses and counts items in arrays (e.g., counting a student's `courses`).
+* **Result View**: Displays pass/fail status for matches and renders the raw JSON for inspection.
 
-## Notes
+### 🧑‍🎓 Client & Data Editor
 
-- Requires **.NET 6+** or later.
-- Uses **Microsoft.Azure.Cosmos** SDK.
-- Connection speed is measured after loading keys and displayed in milliseconds.
+A dynamic entity editor supporting different data models:
 
-## Usage
+* **Dynamic UI**: Toggles input fields between **Student Mode** (ID, Courses) and **Business Mode** (Dealer Num, Products, Branches).
+* **JSON Operations**:
+    * **Import**: Load JSON directly from `.json` files.
+    * **Editor**: Integrated RichTextBox to view/edit JSON before uploading.
+    * **Batch Insert**: Detects if the input is a JSON Array or Object. Automatically handles batch inserts and skips existing IDs.
+* **Direct Cloud Access**: Read, Update, and Delete documents directly via the UI.
 
-1. Clone the repository:
+---
 
-```bash
-git clone https://github.com/NatiG7/CosmosExplorerApp.git
+## 🛠️ Setup & Configuration
+
+### Prerequisites
+
+* Windows 10/11
+* .NET SDK (6.0 or later)
+* Azure Cosmos DB Account (SQL API)
+
+### Configuration
+
+The app uses `App.config` (or `appsettings`) for default credentials and logging paths.
+
+```xml
+<appSettings>
+    <add key="EndPointUri" value="YOUR_COSMOS_URI" />
+    <add key="PrimaryKey" value="YOUR_COSMOS_KEY" />
+    <add key="log_dir" value="./Logs/" />
+</appSettings>
 ```
 
-```bash
-dotnet restore
-```
+---
 
-```bash
-dotnet run
-```
+## 🖥️ Usage Guide
 
-[dbtab]: Screenshots/databases_tab.png
-[ctab]: Screenshots/tables_tab.png
+1.  **Connect**: On the **Databases** tab, click `Load Keys` to initialize the client.
+2.  **Explore**: Use the tabs to navigate between Databases, Containers, and Documents.
+3.  **Insert Data**:
+    * Go to **Client / Student Info**.
+    * Select "Student" or "Business" mode.
+    * Fill in fields or load a JSON file.
+    * Click `Insert to Cloud`.
+4.  **Audit**:
+    * Go to **Investigate**.
+    * Enter the target DB, Table, and Doc ID.
+    * (Optional) Enter field names and expected values (e.g., `status` : `active`).
+    * Click `Investigate Document` to see a full report.
+
+---
+
+## 📸 Screenshots
+
+### Databases & Filtering
+
+![Database Tab](Screenshots/databases_tab.png)
+![Tables Tab](Screenshots/tables_tab.png)
+![Documents Tab](Screenshots/documents_tab.png)
+
+### Investigation & Integrity Check
+
+*Visual verification of document fields and existence.*
+
+### Data Entry & JSON Batching
+
+*Dynamic forms for Students/Businesses and raw JSON editing.*
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
