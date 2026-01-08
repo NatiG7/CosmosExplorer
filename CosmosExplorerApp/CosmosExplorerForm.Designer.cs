@@ -138,6 +138,10 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.CheckBox chkCountCourses;
     private System.Windows.Forms.TextBox txtCourseResult;
 
+    // Logging fields
+    private System.Windows.Forms.Panel pnlLogArea;
+    private System.Windows.Forms.TextBox txtLogActivity;
+
 
 
     /// <summary>
@@ -180,7 +184,7 @@ partial class CosmosExplorerForm
         this.tabClient = new System.Windows.Forms.TabPage();
 
         this.tabControl1.Location = new System.Drawing.Point(10, 10);
-        this.tabControl1.Size = new System.Drawing.Size(850, 870);
+        this.tabControl1.Size = new System.Drawing.Size(850, 800);
 
         this.tabDatabase.Text = "Databases";
         this.tabContainers.Text = "Containers";
@@ -194,7 +198,22 @@ partial class CosmosExplorerForm
         this.tabControl1.Controls.Add(this.tabInvestigation);
         this.tabControl1.Controls.Add(this.tabClient);
 
-        this.Controls.Add(this.tabControl1);
+        this.Controls.Add(this.tabControl1); 
+
+        // ===========================================
+        // =============== LOGGER ====================
+        // ===========================================
+
+        this.pnlLogArea = new Panel();
+        this.pnlLogArea.Height = 80;
+        pnlLogArea.Dock = DockStyle.Bottom;
+        this.Controls.Add(pnlLogArea);
+
+        this.txtLogActivity = new TextBox();
+        this.txtLogActivity.ReadOnly = true;
+        this.txtLogActivity.Height = 100;
+        this.txtLogActivity.Dock = DockStyle.Bottom;
+        this.pnlLogArea.Controls.Add(txtLogActivity);
 
         #region DatabaseTab
         // ===========================================

@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using cloudApp;
+using cloudLogger;
 using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
 
@@ -15,6 +16,15 @@ public partial class CosmosExplorerForm : Form
     {
         InitializeComponent();
         InitDynamicLayout();
+
+        // Logger Listener
+        CosmosLogger.OnLogNotification += (msg) => {
+            this.Invoke((MethodInvoker) delegate
+            {
+                this.txtLogActivity.Text = msg;
+            });
+        };
+        CosmosLogger.Log("System: Logger connected to UI.");
     }
     private void UpdateInputLayout()
     {
@@ -1263,11 +1273,13 @@ public partial class CosmosExplorerForm : Form
                 {
                     lblInvResult.Text = "Match Confirmed!";
                     lblInvResult.ForeColor = Color.Green;
+                    CosmosLogger.Log($"Action: Investigated document id: {docId}");
                 }
                 else
                 {
                     lblInvResult.Text = "Issues Found";
                     lblInvResult.ForeColor = Color.Red;
+                    CosmosLogger.Log($"Action: error investigating document id: {docId}");
                 }
             }
         }
@@ -1305,5 +1317,9 @@ public partial class CosmosExplorerForm : Form
     private void BtnClearInvestigateResult(object sender, EventArgs e)
     {
         rtbInvResult.Clear();
+    }
+    private void BtnClearLogActivity(object sender, EventArgs e)
+    {
+        txtLogActivity.Clear();
     }
 }

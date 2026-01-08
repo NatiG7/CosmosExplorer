@@ -80,3 +80,7 @@ secrets.json
 # Misc
 *.vsix
 .vsconfig
+
+# logging
+Logs/*.*
+Logs/
