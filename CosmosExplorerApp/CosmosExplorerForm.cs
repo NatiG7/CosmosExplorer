@@ -26,6 +26,11 @@ public partial class CosmosExplorerForm : Form
             });
         };
         CosmosLogger.Log("System: Logger online.");
+
+        this.FormClosed += (s,e) =>
+        {
+            CosmosLogger.Log("System: Session Terminated.");
+        };
     }
     private void UpdateInputLayout()
     {
