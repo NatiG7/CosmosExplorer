@@ -1253,6 +1253,7 @@ public partial class CosmosExplorerForm : Form
             List<string> fieldsInvestigateValues = [fieldOneValue, fieldTwoValue, fieldThreeValue];
             List<string> fieldResults = [];
             bool isMatch = true;
+            List<string> failedFields = [];
             if (thisDoc != null)
             {
                 for (int i = 0; i < fieldsInvestigate.Count; i++)
@@ -1265,6 +1266,7 @@ public partial class CosmosExplorerForm : Form
                         {
                             isMatch = false;
                             fieldResults.Add($"Field {fieldsInvestigate[i]} value mismatch!");
+                            failedFields.Add($"{fieldsInvestigate[i]} (Value Mismatch)");
                         }
                         else
                         {
@@ -1275,6 +1277,7 @@ public partial class CosmosExplorerForm : Form
                     {
                         isMatch = false;
                         fieldResults.Add($"Field {fieldsInvestigate[i]} does not exist!");
+                        failedFields.Add($"{fieldsInvestigate[i]} (No such field.)");
                     }
                 }
                 rtbInvResult.Text = string.Join(Environment.NewLine, fieldResults) +
@@ -1286,13 +1289,16 @@ public partial class CosmosExplorerForm : Form
                 {
                     lblInvResult.Text = "Match Confirmed!";
                     lblInvResult.ForeColor = Color.Green;
-                    CosmosLogger.Log($"[Investigation] MATCH CONFIRMED for ID '{docId}'. Fields verified: {string.Join(", ", fieldsInvestigate)}");
+                    List<string> validFields = [.. fieldsInvestigate.Where(f => !string.IsNullOrEmpty(f))];
+                    string fieldsMsg = validFields.Count > 0 ? string.Join(", ", validFields) : "(ID Check)";
+                    CosmosLogger.Log($"[Investigation] MATCH CONFIRMED for ID '{docId}'. Fields verified: {fieldsMsg}");
                 }
                 else
                 {
                     lblInvResult.Text = "Issues Found";
                     lblInvResult.ForeColor = Color.Red;
-                    CosmosLogger.Log($"Action: error investigating document id: {docId}");
+                    string errorDetails = failedFields.Count > 0 ? string.Join(", ", failedFields) : "Unknown Issue";
+                    CosmosLogger.Log($"[Investigation] ISSUES FOUND for ID '{docId}'.\nFailures: {errorDetails}");
                 }
             }
         }
