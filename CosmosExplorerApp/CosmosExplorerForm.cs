@@ -18,13 +18,14 @@ public partial class CosmosExplorerForm : Form
         InitDynamicLayout();
 
         // Logger Listener
-        CosmosLogger.OnLogNotification += (msg) => {
-            this.Invoke((MethodInvoker) delegate
+        CosmosLogger.OnLogNotification += (msg) =>
+        {
+            this.Invoke((MethodInvoker)delegate
             {
                 this.txtLogActivity.Text = msg;
             });
         };
-        CosmosLogger.Log("System: Logger connected to UI.");
+        CosmosLogger.Log("System: Logger online.");
     }
     private void UpdateInputLayout()
     {
@@ -180,8 +181,11 @@ public partial class CosmosExplorerForm : Form
     // ----------------------------------------------------------
     private async void BtnLoadKeys_Click(object sender, EventArgs e)
     {
-        endpointTxtBox.Text = ConfigurationManager.AppSettings["EndPointUri"];
-        pkeyTxtBox.Text = ConfigurationManager.AppSettings["PrimaryKey"];
+        string? endpointUri = ConfigurationManager.AppSettings["EndPointUri"];
+        string? pKey = ConfigurationManager.AppSettings["PrimaryKey"];
+        string port = "";
+        endpointTxtBox.Text = endpointUri;
+        pkeyTxtBox.Text = pKey;
 
         // Initialize helper
         helper = new CosmosHelper(
@@ -192,9 +196,14 @@ public partial class CosmosExplorerForm : Form
         validateHelper();
 
         _client = helper.GetClient();
+        if (endpointUri != null)
+        {
+            port = endpointUri.Split(":")[2] ?? "unknown port";
+        }
 
         await RefreshDatabasesAsync();
         await LoadDatabasesIntoComboBox();
+        CosmosLogger.Log($"Keys Loaded, DB Connection::{port}");
     }
     // ----------------------------------------------------------
     // Create Database
@@ -214,7 +223,7 @@ public partial class CosmosExplorerForm : Form
         }
         if (!validateHelper())
             return;
-
+        CosmosLogger.Log($"[UI] User requested create DB: '{dbNameTxtBox.Text.Trim()}'");
         (bool created, string status) result = await helper.CreateDatabaseAsync(dbName);
         MessageBox.Show(
             $"Database created? {result.created} (Status: {result.status})",
@@ -385,6 +394,7 @@ public partial class CosmosExplorerForm : Form
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            CosmosLogger.Log($"[UI] User requested create Container: '{txtContainerName.Text.Trim()}' in '{selectedDb}'");
             (bool created, string status) = await helper.CreateTableAsync(selectedDb, tableName);
             if (created)
                 MessageBox.Show($"Table created: {tableName}", "Success",
@@ -813,6 +823,7 @@ public partial class CosmosExplorerForm : Form
                     lblJsonStatus.ForeColor = Color.Red;
                     return;
                 }
+                CosmosLogger.Log($"[UI] Batch/Insert initiated for target '{dbName}/{tableName}'");
                 var existing = await helper.GetItemFromCosmosAsync(dbName, tableName, id);
                 if (existing != null)
                 {
@@ -877,6 +888,7 @@ public partial class CosmosExplorerForm : Form
                 lblJsonStatus.Text = $"Item with id '{id}' does not exist!";
                 return;
             }
+            CosmosLogger.Log($"[UI] Update Item '{id}' requested in '{dbName}/{containerName}'");
             await helper.ReplaceItemInCosmosAsync(dbName, containerName, id, json);
             lblJsonStatus.ForeColor = Color.Green;
             lblJsonStatus.Text = "Updated successfully!";
@@ -907,6 +919,7 @@ public partial class CosmosExplorerForm : Form
                 lblJsonStatus.Text = $"Item with id '{id}' does not exist!";
                 return;
             }
+            CosmosLogger.Log($"[UI] Delete Item '{id}' requested in '{dbName}/{containerName}'");
             await helper.DeleteItemFromCosmosAsync(dbName, containerName, id);
             lblJsonStatus.ForeColor = Color.Green;
             lblJsonStatus.Text = "Deleted successfully!";
@@ -1273,7 +1286,7 @@ public partial class CosmosExplorerForm : Form
                 {
                     lblInvResult.Text = "Match Confirmed!";
                     lblInvResult.ForeColor = Color.Green;
-                    CosmosLogger.Log($"Action: Investigated document id: {docId}");
+                    CosmosLogger.Log($"[Investigation] MATCH CONFIRMED for ID '{docId}'. Fields verified: {string.Join(", ", fieldsInvestigate)}");
                 }
                 else
                 {

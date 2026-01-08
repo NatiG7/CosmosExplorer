@@ -3,6 +3,7 @@ using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using cloudLogger;
 
 namespace cloudApp
 {
@@ -43,6 +44,7 @@ namespace cloudApp
         public async Task<(bool created, string status)> CreateDatabaseAsync(string db)
         {
             DatabaseResponse dbResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(db);
+            CosmosLogger.Log($"[Helper] Create Database '{db}': {dbResponse.StatusCode}");
             return (dbResponse.StatusCode == System.Net.HttpStatusCode.Created,
                     dbResponse.StatusCode.ToString());
         }
@@ -51,7 +53,8 @@ namespace cloudApp
             Database dbObj = cosmosClient.GetDatabase(db);
             ContainerResponse cntrResponse =
                 await dbObj.CreateContainerIfNotExistsAsync(table, "/id");
-
+            
+            CosmosLogger.Log($"[Helper] Create Container '{db}/{table}': {cntrResponse.StatusCode}");
             return (cntrResponse.StatusCode == System.Net.HttpStatusCode.Created,
                     cntrResponse.StatusCode.ToString());
         }
@@ -323,7 +326,7 @@ namespace cloudApp
         public async Task<bool> DeleteItemFromCosmosAsync(string dbName, string containerName, string id)
         {
             if (string.IsNullOrEmpty(id))
-                return false; // indicate failure
+                return false;
 
             Database db = cosmosClient.GetDatabase(dbName);
             Container container = db.GetContainer(containerName);
@@ -331,10 +334,12 @@ namespace cloudApp
             try
             {
                 await container.DeleteItemAsync<JObject>(id, new PartitionKey(id));
+                CosmosLogger.Log($"[Helper] Deleted Item ID '{id}' from '{dbName}/{containerName}'");
                 return true;
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
+                CosmosLogger.Log($"[Helper] Failed to delete Item ID '{id}' from '{dbName}/{containerName}\n{ex.Message}'");
                 return false;
             }
         }
@@ -349,6 +354,7 @@ namespace cloudApp
                 item["id"] = id;
             }
             await dbTable.CreateItemAsync(item, new PartitionKey(id));
+            CosmosLogger.Log($"[Helper] Created/Inserted Item ID '{id}' in '{dbName}/{containerName}'");
         }
         public async Task<bool> TableExistsAsync(string dbName, string tableName)
         {
