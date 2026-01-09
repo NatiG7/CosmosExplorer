@@ -7,6 +7,7 @@ using cloudApp;
 using cloudLogger;
 using Newtonsoft.Json.Linq;
 using System.Reflection.Metadata;
+using System.Text.Json.Nodes;
 
 public partial class CosmosExplorerForm : Form
 {
@@ -27,7 +28,7 @@ public partial class CosmosExplorerForm : Form
         };
         CosmosLogger.Log("System: Logger online.");
 
-        this.FormClosed += (s,e) =>
+        this.FormClosed += (s, e) =>
         {
             CosmosLogger.Log("System: Session Terminated.");
         };
@@ -718,6 +719,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void ComboDbTables_SelectedIndexChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string? selectedDb = comboDbTables.SelectedItem?.ToString();
         if (string.IsNullOrEmpty(selectedDb))
             return;
@@ -725,6 +727,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async Task RefreshTablesList(string dbName)
     {
+        if (!validateHelper()) return;
         if (helper == null || string.IsNullOrEmpty(dbName))
             return;
         List<string> tables = await helper.GetTablesAsync(dbName);
@@ -737,6 +740,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async Task UpdateTableCountAsync(string dbName)
     {
+        if (!validateHelper()) return;
         int count = await helper.CountTablesInDBAsync(dbName);
         lblTableCount.Text = $"Tables / Containers: {count}";
     }
@@ -745,6 +749,7 @@ public partial class CosmosExplorerForm : Form
                 Label indicatorLabel,
                     Func<string, Task<bool>> validateFunc)
     {
+        if (!validateHelper()) return;
         string value = textbox.Text.Trim();
 
         if (string.IsNullOrEmpty(value))
@@ -760,6 +765,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtClientDbName_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         await ValidateTextboxAsync(
             txtClientDbName,
                 lblDbCheck,
@@ -767,12 +773,14 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtClientTableName_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string db = txtClientDbName.Text.Trim();
         await ValidateTextboxAsync(txtClientTableName, lblTbCheck,
                 table => helper.TableExistsAsync(db, table));
     }
     private async void TxtClientId_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string dbName = txtClientDbName.Text.Trim();
         string tableName = txtClientTableName.Text.Trim();
         string id = txtClientId.Text.Trim();
@@ -1037,6 +1045,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtCountItemsInDb_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         await ValidateTextboxAsync(
             txtCountItemsInDb,
             lblCountItemsDbCheck,
@@ -1045,6 +1054,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtCountItemsInTable_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string db = txtCountItemsInDb.Text.Trim();
         string table = txtCountItemsInTable.Text.Trim();
         await ValidateTextboxAsync(txtCountItemsInTable, lblCountItemsTableCheck,
@@ -1113,6 +1123,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtEnterDocumentId_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string db = txtCountItemsInDb.Text.Trim();
         string table = txtCountItemsInTable.Text.Trim();
         if (string.IsNullOrEmpty(db) || string.IsNullOrEmpty(table))
@@ -1166,6 +1177,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtInvDb_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         await ValidateTextboxAsync(
             txtInvDb,
             lblInvDbCheck,
@@ -1174,6 +1186,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtInvTable_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string db = txtInvDb.Text.Trim();
         if (string.IsNullOrEmpty(db))
         {
@@ -1188,6 +1201,7 @@ public partial class CosmosExplorerForm : Form
     }
     private async void TxtInvDocId_TextChanged(object sender, EventArgs e)
     {
+        if (!validateHelper()) return;
         string db = txtInvDb.Text.Trim();
         string table = txtInvTable.Text.Trim();
         if (string.IsNullOrEmpty(db) || string.IsNullOrEmpty(table))
@@ -1223,6 +1237,8 @@ public partial class CosmosExplorerForm : Form
     private async void BtnInvestigate_Click(object sender, EventArgs e)
     {
         if (!validateHelper()) return;
+        dgvInvResults.Visible = false;
+        rtbInvResult.Visible = true;
         try
         {
             btnInvestigate.Enabled = false;
@@ -1246,43 +1262,38 @@ public partial class CosmosExplorerForm : Form
                 txtCourseResult.Text = courseOutput;
             }
             else txtCourseResult.Text = "No Courses";
-            // fieldName
-            string fieldNameOne = txtInvFieldName1.Text.Trim();
-            string fieldNameTwo = txtInvFieldName2.Text.Trim();
-            string fieldNameThree = txtInvFieldName3.Text.Trim();
-            List<string> fieldsInvestigate = [fieldNameOne, fieldNameTwo, fieldNameThree];
-            // fieldValue
-            string fieldOneValue = txtInvFieldValue1.Text.Trim();
-            string fieldTwoValue = txtInvFieldValue2.Text.Trim();
-            string fieldThreeValue = txtInvFieldValue3.Text.Trim();
-            List<string> fieldsInvestigateValues = [fieldOneValue, fieldTwoValue, fieldThreeValue];
+            TextBox[] nameBoxes = { txtInvFieldName1, txtInvFieldName2, txtInvFieldName3 };
+            ComboBox[] operatorBoxes = { cmbInvOp1, cmbInvOp2, cmbInvOp3 };
+            TextBox[] valueBoxes = { txtInvFieldValue1, txtInvFieldValue2, txtInvFieldValue3 };
             List<string> fieldResults = [];
-            bool isMatch = true;
             List<string> failedFields = [];
+            bool isMatch = true;
             if (thisDoc != null)
             {
-                for (int i = 0; i < fieldsInvestigate.Count; i++)
+                for (int i = 0; i < 3; i++)
                 {
-                    if (string.IsNullOrEmpty(fieldsInvestigate[i])) continue;
-                    JToken? thisDocField = thisDoc[fieldsInvestigate[i]];
-                    if (thisDocField != null)
+                    string fName = nameBoxes[i].Text.Trim();
+                    string fValue = valueBoxes[i].Text.Trim();
+                    string userOperator = operatorBoxes[i].Text.Trim();
+                    if (string.IsNullOrEmpty(fName)) continue;
+
+                    JToken? dbToken = thisDoc[fName];
+                    if (dbToken != null)
                     {
-                        if (thisDocField.ToString() != fieldsInvestigateValues[i])
-                        {
-                            isMatch = false;
-                            fieldResults.Add($"Field {fieldsInvestigate[i]} value mismatch!");
-                            failedFields.Add($"{fieldsInvestigate[i]} (Value Mismatch)");
-                        }
+                        bool passed = CheckRule(dbToken, userOperator, fValue);
+                        if (passed) fieldResults.Add($"[PASS] Field '{fName}' met condition: {userOperator} '{fValue}'");
                         else
                         {
-                            fieldResults.Add($"Field {fieldsInvestigate[i]} exists\n\tValue: {fieldsInvestigateValues[i]}");
+                            isMatch = false;
+                            fieldResults.Add($"[FAIL] Field '{fName}' is '{dbToken}'. Expected {userOperator} '{fValue}'");
+                            failedFields.Add($"{fName} (Condition Failed)");
                         }
                     }
                     else
                     {
                         isMatch = false;
-                        fieldResults.Add($"Field {fieldsInvestigate[i]} does not exist!");
-                        failedFields.Add($"{fieldsInvestigate[i]} (No such field.)");
+                        fieldResults.Add($"[FAIL] Field '{fName}' does not exist in this document.");
+                        failedFields.Add($"{fName} (Missing)");
                     }
                 }
                 rtbInvResult.Text = string.Join(Environment.NewLine, fieldResults) +
@@ -1290,6 +1301,9 @@ public partial class CosmosExplorerForm : Form
                                     "------------------------------" +
                                     Environment.NewLine +
                                     thisDoc.ToString();
+                List<string> fieldsInvestigate = [txtInvFieldName1.Text.Trim(),
+                                                txtInvFieldName2.Text.Trim(),
+                                                txtInvFieldName3.Text.Trim()];
                 if (isMatch)
                 {
                     lblInvResult.Text = "Match Confirmed!";
@@ -1318,6 +1332,53 @@ public partial class CosmosExplorerForm : Form
             btnInvestigate.Text = "Investigate Document";
         }
     }
+    private bool CheckRule(JToken? dbToken, string userOperator, string userValue)
+    {
+        if (dbToken == null) return false;
+
+        // jsonArray check, rule engine upgrade
+        if (dbToken is JArray jsonArr)
+        {
+            if (userOperator.StartsWith("Length"))
+            {
+                if (int.TryParse(userValue, out int lenLen))
+                {
+                    if (userOperator == "Length >") return jsonArr.Count > lenLen;
+                    if (userOperator == "Length <") return jsonArr.Count < lenLen;
+                    if (userOperator == "Length =") return jsonArr.Count == lenLen;
+                }
+                return false;
+            }
+            foreach (JToken item in jsonArr) if(CheckRule(item, userOperator, userValue)) return true;
+            return false;
+        }
+        string dbVal = dbToken.ToString();
+        switch (userOperator)
+        {
+            case "==": return dbVal.Equals(userValue, StringComparison.OrdinalIgnoreCase);
+            case "!=": return !dbVal.Equals(userValue, StringComparison.OrdinalIgnoreCase);
+            case "Contains": return dbVal.Contains(userValue, StringComparison.OrdinalIgnoreCase);
+            case "StartsWith": return dbVal.StartsWith(userValue, StringComparison.OrdinalIgnoreCase);
+            case ">":
+            case "<":
+                if (double.TryParse(dbVal, out double dbNum)
+                && double.TryParse(userValue, out double userNum))
+                { return userOperator == ">" ? dbNum > userNum : dbNum < userNum; }
+                return false;
+            case "Length >":
+            case "Length <":
+            case "Length =":
+                if (int.TryParse(userValue, out int lenLen))
+                {
+                    return userOperator == "Length >" ? dbVal.Length > lenLen : dbVal.Length < lenLen;
+                }
+                else if (userOperator == "Length =") return dbVal.Length == lenLen;
+                return false;
+
+            default:
+                return false;
+        }
+    }
     private string FetchStudentCourses(JObject? document)
     {
         if (document == null) return "Error reading document.";
@@ -1342,8 +1403,106 @@ public partial class CosmosExplorerForm : Form
     {
         rtbInvResult.Clear();
     }
-    private void BtnClearLogActivity(object sender, EventArgs e)
+    private async void BtnSearchItems_Click(object sender, EventArgs e)
     {
-        txtLogActivity.Clear();
+        if (!validateHelper()) return;
+        string db = txtInvDb.Text.Trim();
+        string table = txtInvTable.Text.Trim();
+        // validate
+        if (!await ValidateInputAndExistsAsync(db, "Database", () => helper.DatabaseExistsAsync(db))) return;
+        if (!await ValidateInputAndExistsAsync(table, "Table", () => helper.TableExistsAsync(db, table))) return;
+
+        try
+        {
+            btnSearchItems.Enabled = false;
+            btnSearchItems.Text = "Scanning...";
+            rtbInvResult.Visible = false;
+            dgvInvResults.Visible = true;
+            dgvInvResults.DataSource = null;
+            List<JObject> allDocs = await helper.GetAllDocumentsAsync(db, table);
+            TextBox[] nameBoxes = { txtInvFieldName1, txtInvFieldName2, txtInvFieldName3 };
+            ComboBox[] opBoxes = { cmbInvOp1, cmbInvOp2, cmbInvOp3 };
+            TextBox[] valueBoxes = { txtInvFieldValue1, txtInvFieldValue2, txtInvFieldValue3 };
+            var matchedDocs = new List<dynamic>();
+            List<string> activeRules = [];
+            for (int i = 0; i < 3; i++)
+            {
+                if (!string.IsNullOrEmpty(nameBoxes[i].Text))
+                    activeRules.Add($"{nameBoxes[i].Text} {opBoxes[i].Text} {valueBoxes[i].Text}");
+            }
+            string ruleSummary = activeRules.Count > 0 ? string.Join(" AND ", activeRules) : "No Constraints";
+            CosmosLogger.Log($"[Search] START scanning '{table}'. Criteria: {ruleSummary}");
+
+            foreach (JObject doc in allDocs)
+            {
+                bool isMatch = true;
+                string matchSummary = "";
+                for (int i = 0; i < 3; i++)
+                {
+                    string fName = nameBoxes[i].Text.Trim();
+                    string op = opBoxes[i].Text;
+                    string fVal = valueBoxes[i].Text.Trim();
+                    if (string.IsNullOrEmpty(fName)) continue;
+                    List<JToken> docTokens = doc.SelectTokens(fName).ToList();
+                    JToken? docToken = docTokens.Count > 1 ? new JArray(docTokens) : docTokens.FirstOrDefault();
+                    bool passed = CheckRule(docToken, op, fVal);
+                    if (!passed)
+                    {
+                        isMatch = false;
+                        break;
+                    }
+                    matchSummary += $"{fName}={docToken} | ";
+                }
+                if (isMatch)
+                {
+                    var previewProps = doc.Properties()
+                    .Where(p => p.Name != "id" && !p.Name.StartsWith("_"))
+                    .Take(5)
+                    .Select(p => $"{p.Name}:{LimitLength(p.Value.ToString(), 30)}")
+                    .ToList();
+
+                    string previewStr = string.Join(" | ", previewProps);
+                    matchedDocs.Add(new
+                    {
+                        ID = doc["id"]?.ToString(),
+                        Preview = previewStr,
+                        MatchRules = matchSummary.TrimEnd(' ', '|')
+                    });
+                }
+            }
+            if (matchedDocs.Count > 0)
+            {
+                dgvInvResults.DataSource = matchedDocs;
+                lblInvResult.Text = $"Found {matchedDocs.Count} documents.";
+                lblInvResult.ForeColor = Color.Green;
+                CosmosLogger.Log($"[Search] Filter found {matchedDocs.Count} matches in '{table}'");
+            }
+            else
+            {
+                lblInvResult.Text = "No documents matched.";
+                lblInvResult.ForeColor = Color.Red;
+                CosmosLogger.Log("[Search] FINISHED. No documents matched.");
+                MessageBox.Show("No documents matched your criteria.",
+                "Search Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            CosmosLogger.Log($"[Search] ERROR: {ex.Message}");
+            MessageBox.Show($"Error searching: {ex.Message}", "Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnSearchItems.Enabled = true;
+            btnSearchItems.Text = "Search / Filter";
+        }
+    }
+    private string LimitLength(string source, int maxLength)
+    {
+        if (string.IsNullOrEmpty(source)) return "";
+        source = source.Replace("\r", "").Replace("\n", " ");
+        if (source.Length <= maxLength) return source;
+        return source.Substring(0, maxLength) + "...";
     }
 }

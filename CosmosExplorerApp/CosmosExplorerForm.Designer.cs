@@ -137,6 +137,11 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.RichTextBox rtbInvResult;
     private System.Windows.Forms.CheckBox chkCountCourses;
     private System.Windows.Forms.TextBox txtCourseResult;
+    private System.Windows.Forms.ComboBox cmbInvOp1;
+    private System.Windows.Forms.ComboBox cmbInvOp2;
+    private System.Windows.Forms.ComboBox cmbInvOp3;
+    private System.Windows.Forms.DataGridView dgvInvResults;
+    private System.Windows.Forms.Button btnSearchItems;
 
     // Logging fields
     private System.Windows.Forms.Panel pnlLogArea;
@@ -198,7 +203,7 @@ partial class CosmosExplorerForm
         this.tabControl1.Controls.Add(this.tabInvestigation);
         this.tabControl1.Controls.Add(this.tabClient);
 
-        this.Controls.Add(this.tabControl1); 
+        this.Controls.Add(this.tabControl1);
 
         // ===========================================
         // =============== LOGGER ====================
@@ -773,7 +778,9 @@ partial class CosmosExplorerForm
         #endregion
 
         #region Investigate Document
-        // left side target
+        // 
+        // 1. LEFT SIDE (Target Info)
+        // 
 
         // lblInvDb
         this.lblInvDb = new System.Windows.Forms.Label();
@@ -790,7 +797,7 @@ partial class CosmosExplorerForm
         // db_check
         this.lblInvDbCheck = new System.Windows.Forms.Label();
         this.lblInvDbCheck.AutoSize = true;
-        this.lblInvDbCheck.Location = new System.Drawing.Point(230, 48); // aligned with txtInvDb
+        this.lblInvDbCheck.Location = new System.Drawing.Point(230, 48);
         this.lblInvDbCheck.Text = "";
         this.lblInvDbCheck.ForeColor = System.Drawing.Color.Green;
 
@@ -809,7 +816,7 @@ partial class CosmosExplorerForm
         // table_check
         this.lblInvTableCheck = new System.Windows.Forms.Label();
         this.lblInvTableCheck.AutoSize = true;
-        this.lblInvTableCheck.Location = new System.Drawing.Point(230, 108); // aligned with txtInvTable
+        this.lblInvTableCheck.Location = new System.Drawing.Point(230, 108);
         this.lblInvTableCheck.Text = "";
         this.lblInvTableCheck.ForeColor = System.Drawing.Color.Green;
 
@@ -828,54 +835,90 @@ partial class CosmosExplorerForm
         // docId_check
         this.lblInvDocIdCheck = new System.Windows.Forms.Label();
         this.lblInvDocIdCheck.AutoSize = true;
-        this.lblInvDocIdCheck.Location = new System.Drawing.Point(230, 168); // aligned with txtInvDocId
+        this.lblInvDocIdCheck.Location = new System.Drawing.Point(230, 168);
         this.lblInvDocIdCheck.Text = "";
         this.lblInvDocIdCheck.ForeColor = System.Drawing.Color.Green;
 
-        // right side conditions
-        int col2X = 300; // alignment
 
+        // 
+        // 2. RIGHT SIDE (Conditions & Layout Fixes)
+        // 
+        int col2X = 300;
+
+        // Header
         this.lblInvConditions = new System.Windows.Forms.Label();
         this.lblInvConditions.AutoSize = true;
         this.lblInvConditions.Location = new System.Drawing.Point(col2X, 20);
-        this.lblInvConditions.Text = "Field Constraints (Name = Value)";
+        this.lblInvConditions.Text = "Field Constraints (Field - Op - Value)";
         this.lblInvConditions.Font = new System.Drawing.Font(this.Font, System.Drawing.FontStyle.Bold);
 
-        // txtInvFieldName1
+        // --- ROW 1 ---
+        // Field Name 1 (Shrunk to 110 width)
         this.txtInvFieldName1 = new System.Windows.Forms.TextBox();
         this.txtInvFieldName1.Location = new System.Drawing.Point(col2X, 45);
-        this.txtInvFieldName1.Width = 150;
-        this.txtInvFieldName1.PlaceholderText = "Field Name 1";
+        this.txtInvFieldName1.Width = 110;
+        this.txtInvFieldName1.PlaceholderText = "Field Name";
 
-        // txtInvFieldValue1
+        // Operator 1 (Placed at X=420)
+        this.cmbInvOp1 = new System.Windows.Forms.ComboBox();
+        this.cmbInvOp1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        this.cmbInvOp1.Items.AddRange(new object[] { "==", "!=", ">", "<", "Contains",
+                                                "Length >", "Length <", "Length =", "StartsWith" });
+        this.cmbInvOp1.Location = new System.Drawing.Point(col2X + 120, 45);
+        this.cmbInvOp1.Size = new System.Drawing.Size(80, 23);
+        this.cmbInvOp1.SelectedIndex = 0;
+
+        // Value 1 (Moved to X=485)
         this.txtInvFieldValue1 = new System.Windows.Forms.TextBox();
-        this.txtInvFieldValue1.Location = new System.Drawing.Point(col2X + 160, 45);
-        this.txtInvFieldValue1.Width = 150;
-        this.txtInvFieldValue1.PlaceholderText = "Value 1";
+        this.txtInvFieldValue1.Location = new System.Drawing.Point(col2X + 210, 45);
+        this.txtInvFieldValue1.Width = 110;
+        this.txtInvFieldValue1.PlaceholderText = "Value";
 
-        // txtInvFieldName2
+
+        // --- ROW 2 ---
+        // Field Name 2
         this.txtInvFieldName2 = new System.Windows.Forms.TextBox();
         this.txtInvFieldName2.Location = new System.Drawing.Point(col2X, 80);
-        this.txtInvFieldName2.Width = 150;
-        this.txtInvFieldName2.PlaceholderText = "Field Name 2";
+        this.txtInvFieldName2.Width = 110;
+        this.txtInvFieldName2.PlaceholderText = "Field Name";
 
-        // txtInvFieldValue2
+        // Operator 2
+        this.cmbInvOp2 = new System.Windows.Forms.ComboBox();
+        this.cmbInvOp2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        this.cmbInvOp2.Items.AddRange(new object[] { "==", "!=", ">", "<", "Contains",
+                                                "Length >", "Length <", "Length =", "StartsWith" });
+        this.cmbInvOp2.Location = new System.Drawing.Point(col2X + 120, 80);
+        this.cmbInvOp2.Size = new System.Drawing.Size(80, 23);
+        this.cmbInvOp2.SelectedIndex = 0;
+
+        // Value 2
         this.txtInvFieldValue2 = new System.Windows.Forms.TextBox();
-        this.txtInvFieldValue2.Location = new System.Drawing.Point(col2X + 160, 80);
-        this.txtInvFieldValue2.Width = 150;
-        this.txtInvFieldValue2.PlaceholderText = "Value 2";
+        this.txtInvFieldValue2.Location = new System.Drawing.Point(col2X + 210, 80);
+        this.txtInvFieldValue2.Width = 110;
+        this.txtInvFieldValue2.PlaceholderText = "Value";
 
-        // txtInvFieldName3
+
+        // --- ROW 3 ---
+        // Field Name 3
         this.txtInvFieldName3 = new System.Windows.Forms.TextBox();
         this.txtInvFieldName3.Location = new System.Drawing.Point(col2X, 115);
-        this.txtInvFieldName3.Width = 150;
-        this.txtInvFieldName3.PlaceholderText = "Field Name 3";
+        this.txtInvFieldName3.Width = 110;
+        this.txtInvFieldName3.PlaceholderText = "Field Name";
 
-        // txtInvFieldValue3
+        // Operator 3
+        this.cmbInvOp3 = new System.Windows.Forms.ComboBox();
+        this.cmbInvOp3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        this.cmbInvOp3.Items.AddRange(new object[] { "==", "!=", ">", "<", "Contains",
+                                                "Length >", "Length <", "Length =", "StartsWith" });
+        this.cmbInvOp3.Location = new System.Drawing.Point(col2X + 120, 115);
+        this.cmbInvOp3.Size = new System.Drawing.Size(80, 23);
+        this.cmbInvOp3.SelectedIndex = 0;
+
+        // Value 3
         this.txtInvFieldValue3 = new System.Windows.Forms.TextBox();
-        this.txtInvFieldValue3.Location = new System.Drawing.Point(col2X + 160, 115);
-        this.txtInvFieldValue3.Width = 150;
-        this.txtInvFieldValue3.PlaceholderText = "Value 3";
+        this.txtInvFieldValue3.Location = new System.Drawing.Point(col2X + 210, 115);
+        this.txtInvFieldValue3.Width = 110;
+        this.txtInvFieldValue3.PlaceholderText = "Value";
 
         // btnInvestigate
         this.btnInvestigate = new System.Windows.Forms.Button();
@@ -897,10 +940,28 @@ partial class CosmosExplorerForm
         this.rtbInvResult.Size = new System.Drawing.Size(600, 400);
         this.rtbInvResult.ReadOnly = true;
         this.rtbInvResult.BackColor = System.Drawing.SystemColors.Window;
-        
+
+        // dgvInvResults (The Table View)
+        this.dgvInvResults = new System.Windows.Forms.DataGridView();
+        this.dgvInvResults.Location = new System.Drawing.Point(20, 310); // Same spot as RTB
+        this.dgvInvResults.Size = new System.Drawing.Size(800, 400);     // Same size as RTB
+        this.dgvInvResults.Visible = false; // Hidden by default
+        this.dgvInvResults.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+        this.tabInvestigation.Controls.Add(this.dgvInvResults);
+
+        // btnSearchItems (The Task Button)
+        this.btnSearchItems = new System.Windows.Forms.Button();
+        this.btnSearchItems.Text = "Search / Filter";
+        this.btnSearchItems.Location = new System.Drawing.Point(230, 220); // Next to Investigate button
+        this.btnSearchItems.Size = new System.Drawing.Size(150, 40);
+        this.btnSearchItems.UseVisualStyleBackColor = true;
+        this.btnSearchItems.Click += BtnSearchItems_Click;
+        this.tabInvestigation.Controls.Add(this.btnSearchItems);
+
         // chkCountCourses
         this.chkCountCourses = new System.Windows.Forms.CheckBox();
         this.chkCountCourses.AutoSize = true;
+
         this.chkCountCourses.Location = new System.Drawing.Point(20, 270);
         this.chkCountCourses.Text = "Count Student Courses";
         this.chkCountCourses.UseVisualStyleBackColor = true;
@@ -912,7 +973,10 @@ partial class CosmosExplorerForm
         this.txtCourseResult.ReadOnly = true;
         this.txtCourseResult.Text = "No Courses.";
 
-        // Add controls
+
+        // 
+        // 4. ADD CONTROLS TO TAB
+        // 
         this.tabInvestigation.Controls.Add(this.lblInvDb);
         this.tabInvestigation.Controls.Add(this.txtInvDb);
         this.tabInvestigation.Controls.Add(this.lblInvDbCheck);
@@ -924,21 +988,29 @@ partial class CosmosExplorerForm
         this.tabInvestigation.Controls.Add(this.lblInvDocIdCheck);
 
         this.tabInvestigation.Controls.Add(this.lblInvConditions);
+
+        // Row 1
         this.tabInvestigation.Controls.Add(this.txtInvFieldName1);
+        this.tabInvestigation.Controls.Add(this.cmbInvOp1);
         this.tabInvestigation.Controls.Add(this.txtInvFieldValue1);
+
+        // Row 2
         this.tabInvestigation.Controls.Add(this.txtInvFieldName2);
+        this.tabInvestigation.Controls.Add(this.cmbInvOp2);
         this.tabInvestigation.Controls.Add(this.txtInvFieldValue2);
+
+        // Row 3
         this.tabInvestigation.Controls.Add(this.txtInvFieldName3);
+        this.tabInvestigation.Controls.Add(this.cmbInvOp3);
         this.tabInvestigation.Controls.Add(this.txtInvFieldValue3);
 
         this.tabInvestigation.Controls.Add(this.btnInvestigate);
         this.tabInvestigation.Controls.Add(this.lblInvResult);
         this.tabInvestigation.Controls.Add(this.rtbInvResult);
-
         this.tabInvestigation.Controls.Add(this.chkCountCourses);
         this.tabInvestigation.Controls.Add(this.txtCourseResult);
 
-        # endregion
+        #endregion
 
         #region Client/Student Info
         // Database name

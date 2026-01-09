@@ -432,5 +432,23 @@ namespace cloudApp
             }
             return totCount;
         }
+        public async Task<List<JObject>> GetAllDocumentsAsync(string dbName, string tableName)
+        {
+            if (string.IsNullOrEmpty(dbName) || string.IsNullOrEmpty(tableName)) return [];
+
+            try
+            {
+                Database db = cosmosClient.GetDatabase(dbName);
+                Container table = db.GetContainer(tableName);
+                QueryDefinition getItemsQuery = new("SELECT * FROM c");
+                // using terminates object after use, mem EFF++
+                using FeedIterator<JObject> iterator = table.GetItemQueryIterator<JObject>(getItemsQuery);
+                return await ExecuteQueryAsync(iterator);
+            }
+            catch
+            {
+                return [];
+            }
+        }
     }
 }
