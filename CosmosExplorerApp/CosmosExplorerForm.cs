@@ -202,10 +202,11 @@ public partial class CosmosExplorerForm : Form
         validateHelper();
 
         _client = helper.GetClient();
-        if (endpointUri != null)
+        if (endpointUri != null && Uri.TryCreate(endpointUri, UriKind.Absolute, out Uri? uriParseResult))
         {
-            port = endpointUri.Split(":")[2] ?? "unknown port";
+            port = uriParseResult.Port.ToString();
         }
+        else port = "Uknown";
 
         await RefreshDatabasesAsync();
         await LoadDatabasesIntoComboBox();
@@ -230,16 +231,24 @@ public partial class CosmosExplorerForm : Form
         if (!validateHelper())
             return;
         CosmosLogger.Log($"[UI] User requested create DB: '{dbNameTxtBox.Text.Trim()}'");
-        (bool created, string status) result = await helper.CreateDatabaseAsync(dbName);
-        MessageBox.Show(
-            $"Database created? {result.created} (Status: {result.status})",
-            "DB Creation",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Information
-        );
+        try
+        {
+            (bool created, string status) result = await helper.CreateDatabaseAsync(dbName);
+            MessageBox.Show(
+                $"Database created? {result.created} (Status: {result.status})",
+                "DB Creation",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information
+            );
 
-        await RefreshDatabasesAsync();
-        await LoadDatabasesIntoComboBox();
+            await RefreshDatabasesAsync();
+            await LoadDatabasesIntoComboBox();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error refreshing tables: {ex.Message}", "Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
     private async void BtnCountDatabases_Click(object sender, EventArgs e)
     {
@@ -284,47 +293,55 @@ public partial class CosmosExplorerForm : Form
         List<string> filteredDbs = [];
         cmbFilteredDbs.Items.Clear();
         // checkbox logic
-        if (chkMatchTables.Checked && chkLongestNames.Checked)
+        try
         {
-            MessageBox.Show("Please select only one option at a time.", "Warning",
-                MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
-        }
-        if (chkMatchTables.Checked)
-        {
-            string output = await helper.GetDbsWithTablesStartingWithAsync(prefix);
-            filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (filteredDbs.Count == 0)
+            if (chkMatchTables.Checked && chkLongestNames.Checked)
             {
-                MessageBox.Show("No databases found with matching tables.", "Info",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Please select only one option at a time.", "Warning",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-        }
-        else if (chkLongestNames.Checked)
-        {
-            string output = await helper.GetLongestDbNameStartingWith(prefix);
-            filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
-            if (filteredDbs.Count == 0)
+            if (chkMatchTables.Checked)
             {
+                string output = await helper.GetDbsWithTablesStartingWithAsync(prefix);
+                filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (filteredDbs.Count == 0)
+                {
+                    MessageBox.Show("No databases found with matching tables.", "Info",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+            else if (chkLongestNames.Checked)
+            {
+                string output = await helper.GetLongestDbNameStartingWith(prefix);
+                filteredDbs = output.Split([Environment.NewLine], StringSplitOptions.RemoveEmptyEntries).ToList();
+                if (filteredDbs.Count == 0)
+                {
+                    MessageBox.Show("No databases found with that prefix.", "Info",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+            }
+            else
+            // default behavior
+            {
+                filteredDbs = await helper.GetDBsStartingWithAsync(prefix);
+            }
+            foreach (string db in filteredDbs)
+                cmbFilteredDbs.Items.Add(db);
+            // Auto-select first item
+            if (cmbFilteredDbs.Items.Count > 0)
+                cmbFilteredDbs.SelectedIndex = 0;
+            else
                 MessageBox.Show("No databases found with that prefix.", "Info",
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
         }
-        else
-        // default behavior
+        catch (Exception ex)
         {
-            filteredDbs = await helper.GetDBsStartingWithAsync(prefix);
+            MessageBox.Show($"Error refreshing tables: {ex.Message}", "Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
-        foreach (string db in filteredDbs)
-            cmbFilteredDbs.Items.Add(db);
-        // Auto-select first item
-        if (cmbFilteredDbs.Items.Count > 0)
-            cmbFilteredDbs.SelectedIndex = 0;
-        else
-            MessageBox.Show("No databases found with that prefix.", "Info",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
     private async void BtnRefreshTables_Click(object sender, EventArgs e)
     {
@@ -574,7 +591,11 @@ public partial class CosmosExplorerForm : Form
         {
             if (!validateHelper()) return;
             cmbMinLegthTables.Items.Clear();
-            int minLength = int.Parse(txtMinTableLengthInput.Text.Trim());
+            if (!int.TryParse(txtMinTableLengthInput.Text.Trim(), out int minLength))
+            {
+                MessageBox.Show("Please enter a valid number for length.", "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             // flag for displaying DB names only once
             bool returnDbNamesOnlyOnce = chkDbNameOnly.Checked;
             List<string> dbs = await helper.GetDatabasesAsync();
@@ -723,7 +744,12 @@ public partial class CosmosExplorerForm : Form
         string? selectedDb = comboDbTables.SelectedItem?.ToString();
         if (string.IsNullOrEmpty(selectedDb))
             return;
-        await RefreshTablesList(selectedDb);
+        try { await RefreshTablesList(selectedDb); }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error refreshing tables: {ex.Message}", "Error",
+            MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
     }
     private async Task RefreshTablesList(string dbName)
     {
@@ -758,10 +784,17 @@ public partial class CosmosExplorerForm : Form
             return;
         }
 
-        bool exists = await validateFunc(value);
-
-        indicatorLabel.Text = exists ? "✔" : "✖";
-        indicatorLabel.ForeColor = exists ? Color.Green : Color.Red;
+        try
+        {
+            bool exists = await validateFunc(value);
+            indicatorLabel.Text = exists ? "✔" : "✖";
+            indicatorLabel.ForeColor = exists ? Color.Green : Color.Red;
+        }
+        catch (Exception)
+        {
+            indicatorLabel.Text = "⚠";
+            indicatorLabel.ForeColor = Color.Orange;
+        }
     }
     private async void TxtClientDbName_TextChanged(object sender, EventArgs e)
     {
@@ -795,17 +828,19 @@ public partial class CosmosExplorerForm : Form
         lblIdCheck.Text = exists ? "✔" : "✖";
         lblIdCheck.ForeColor = exists ? Color.Green : Color.Red;
     }
-    //=======================================================
-    //                    JSON Utils
-    //=======================================================
     private void BtnLoadJsonFile_Click(object sender, EventArgs e)
     {
         using OpenFileDialog ofd = new OpenFileDialog();
         ofd.Filter = "JSON files|*.json";
         if (ofd.ShowDialog() == DialogResult.OK)
         {
-            string json = File.ReadAllText(ofd.FileName);
-            txtJsonContent.Text = json;
+            try
+            {
+                string json = File.ReadAllText(ofd.FileName);
+                txtJsonContent.Text = json;
+            }
+            catch (Exception ex)
+            { MessageBox.Show($"Could not read file : {ex.Message}", "File Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
     }
     private void BtnClearJson_Click(object sender, EventArgs e)
@@ -1349,7 +1384,7 @@ public partial class CosmosExplorerForm : Form
                 }
                 return false;
             }
-            foreach (JToken item in jsonArr) if(CheckRule(item, userOperator, userValue)) return true;
+            foreach (JToken item in jsonArr) if (CheckRule(item, userOperator, userValue)) return true;
             return false;
         }
         string dbVal = dbToken.ToString();

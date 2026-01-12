@@ -152,27 +152,6 @@ namespace cloudApp
             return DBsContainingTable;
         }
         // --------------------------------------------------------------------
-        // Count tables in each DB
-        // --------------------------------------------------------------------
-        public async Task<List<string>> CountTablesPerDBAsync()
-        {
-            List<string> dbTableCounts = [];
-            List<string> allDbs = await GetDatabasesAsync();
-            foreach (string db in allDbs)
-            {
-                try
-                {
-                    List<string> tablesInThisDB = await GetTablesAsync(db);
-                    dbTableCounts.Add($"{db} - Tables: {tablesInThisDB.Count}");
-                }
-                catch (Exception)
-                {
-                    dbTableCounts.Add($"{db} - Error: Could not retrieve tables.");
-                }
-            }
-            return dbTableCounts;
-        }
-        // --------------------------------------------------------------------
         // Count tables in a DB
         // --------------------------------------------------------------------
         public async Task<int> CountTablesInDBAsync(string dbName)
@@ -447,7 +426,7 @@ namespace cloudApp
             }
             catch
             {
-                return [];
+                throw;
             }
         }
     }
