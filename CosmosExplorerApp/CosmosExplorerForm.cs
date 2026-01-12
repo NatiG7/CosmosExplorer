@@ -1370,9 +1370,10 @@ public partial class CosmosExplorerForm : Form
             case "Length =":
                 if (int.TryParse(userValue, out int lenLen))
                 {
-                    return userOperator == "Length >" ? dbVal.Length > lenLen : dbVal.Length < lenLen;
+                    if (userOperator == "Length >") return dbVal.Length > lenLen;
+                    if (userOperator == "Length <") return dbVal.Length < lenLen;
+                    if (userOperator == "Length =") return dbVal.Length == lenLen;
                 }
-                else if (userOperator == "Length =") return dbVal.Length == lenLen;
                 return false;
 
             default:
