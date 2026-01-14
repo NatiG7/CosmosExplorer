@@ -664,7 +664,7 @@ partial class CosmosExplorerForm
         // lblCountItemsInDbResult
         this.lblCountItemsInDbResult = new Label();
         this.lblCountItemsInDbResult.AutoSize = true;
-        this.lblCountItemsInDbResult.Location = new System.Drawing.Point(520, 88);
+        this.lblCountItemsInDbResult.Location = new System.Drawing.Point(480, 88);
         this.lblCountItemsInDbResult.Text = "Result: -";
 
         // lblCountItemsInTable
@@ -698,7 +698,7 @@ partial class CosmosExplorerForm
         // lblCountItemsInTableResult
         this.lblCountItemsInTableResult = new Label();
         this.lblCountItemsInTableResult.AutoSize = true;
-        this.lblCountItemsInTableResult.Location = new System.Drawing.Point(520, 142);
+        this.lblCountItemsInTableResult.Location = new System.Drawing.Point(480, 142);
         this.lblCountItemsInTableResult.Text = "Result: -";
 
         // lblEnterDocumentId
@@ -759,7 +759,7 @@ partial class CosmosExplorerForm
         this.btnListObjCounts.UseVisualStyleBackColor = true;
         this.btnListObjCounts.Click += new System.EventHandler(this.BtnCountAllDocsAllTables_Click);
 
-        // cmbListObjCounts (Result for Feature A)
+        // cmbListObjCounts
         this.cmbListObjCounts = new System.Windows.Forms.ComboBox();
         this.cmbListObjCounts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
         this.cmbListObjCounts.FormattingEnabled = true;
@@ -776,7 +776,7 @@ partial class CosmosExplorerForm
         this.btnMaxObjCounts.UseVisualStyleBackColor = true;
         this.btnMaxObjCounts.Click += new System.EventHandler(this.BtnCountMaxDocuments_Click);
 
-        // txtMaxObjCountsResult (Result for Feature B)
+        // txtMaxObjCountsResult
         this.txtMaxObjCountsResult = new System.Windows.Forms.TextBox();
         this.txtMaxObjCountsResult.Location = new System.Drawing.Point(600, 140);
         this.txtMaxObjCountsResult.Name = "txtMaxObjCountsResult";
