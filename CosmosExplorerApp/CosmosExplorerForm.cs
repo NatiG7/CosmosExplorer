@@ -115,7 +115,7 @@ public partial class CosmosExplorerForm : Form
     // ----------------------------------------------------------
     // Refresh DB list
     // ----------------------------------------------------------
-    private async Task RefreshDatabasesAsync()
+    private async Task<bool> RefreshDatabasesAsync()
     {
         try
         {
@@ -130,7 +130,7 @@ public partial class CosmosExplorerForm : Form
                                     "Error",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
-                    return;
+                    return false; ;
                 }
 
                 // Create helper once
@@ -155,6 +155,7 @@ public partial class CosmosExplorerForm : Form
             {
                 this.Text = "Cosmos DB Explorer - Connected (Latency: N/A)";
             }
+            return true;
         }
         catch (Exception ex)
         {
@@ -163,6 +164,7 @@ public partial class CosmosExplorerForm : Form
                 "Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
+            return false;
         }
     }
     private async Task<double> MeasureConnectionSpeedAsync()
@@ -187,30 +189,38 @@ public partial class CosmosExplorerForm : Form
     // ----------------------------------------------------------
     private async void BtnLoadKeys_Click(object sender, EventArgs e)
     {
-        string? endpointUri = ConfigurationManager.AppSettings["EndPointUri"];
-        string? pKey = ConfigurationManager.AppSettings["PrimaryKey"];
-        string port = "";
-        endpointTxtBox.Text = endpointUri;
-        pkeyTxtBox.Text = pKey;
-
-        // Initialize helper
-        helper = new CosmosHelper(
-            endpointTxtBox.Text.Trim(),
-            pkeyTxtBox.Text.Trim()
-        );
-
-        validateHelper();
-
-        _client = helper.GetClient();
-        if (endpointUri != null && Uri.TryCreate(endpointUri, UriKind.Absolute, out Uri? uriParseResult))
+        try
         {
-            port = uriParseResult.Port.ToString();
-        }
-        else port = "Uknown";
+            string? endpointUri = ConfigurationManager.AppSettings["EndPointUri"];
+            string? pKey = ConfigurationManager.AppSettings["PrimaryKey"];
+            string port = "";
+            endpointTxtBox.Text = endpointUri;
+            pkeyTxtBox.Text = pKey;
 
-        await RefreshDatabasesAsync();
-        await LoadDatabasesIntoComboBox();
-        CosmosLogger.Log($"Keys Loaded, DB Connection::{port}");
+            // Initialize helper
+            helper = new CosmosHelper(
+                endpointTxtBox.Text.Trim(),
+                pkeyTxtBox.Text.Trim()
+            );
+
+            validateHelper();
+
+            _client = helper.GetClient();
+            if (endpointUri != null && Uri.TryCreate(endpointUri, UriKind.Absolute, out Uri? uriParseResult))
+            {
+                port = uriParseResult.Port.ToString();
+            }
+            else port = "Uknown";
+
+            if (!await RefreshDatabasesAsync()) return;
+            await LoadDatabasesIntoComboBox();
+            CosmosLogger.Log($"Keys Loaded, DB Connection::{port}");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Connection Failed: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            CosmosLogger.Log($"[System] Keys Load Failed: {ex.Message}");
+        }
     }
     // ----------------------------------------------------------
     // Create Database
@@ -241,7 +251,7 @@ public partial class CosmosExplorerForm : Form
                 MessageBoxIcon.Information
             );
 
-            await RefreshDatabasesAsync();
+            if (!await RefreshDatabasesAsync()) return;
             await LoadDatabasesIntoComboBox();
         }
         catch (Exception ex)
@@ -823,10 +833,17 @@ public partial class CosmosExplorerForm : Form
             lblIdCheck.Text = "";
             return;
         }
-
-        bool exists = await helper.ItemExistsAsync(dbName, tableName, id);
-        lblIdCheck.Text = exists ? "✔" : "✖";
-        lblIdCheck.ForeColor = exists ? Color.Green : Color.Red;
+        try
+        {
+            bool exists = await helper.ItemExistsAsync(dbName, tableName, id);
+            lblIdCheck.Text = exists ? "✔" : "✖";
+            lblIdCheck.ForeColor = exists ? Color.Green : Color.Red;
+        }
+        catch (Exception)
+        {
+            lblIdCheck.Text = "⚠";
+            lblIdCheck.ForeColor = Color.Orange;
+        }
     }
     private void BtnLoadJsonFile_Click(object sender, EventArgs e)
     {
@@ -1098,7 +1115,8 @@ public partial class CosmosExplorerForm : Form
                         TableName = thisTable
                     };
                     int itemCount = await helper.CountItemsInTableAsync(tableData);
-                    allDocsPerTableList.Add($"{tableData.DbName} - {tableData.TableName} - {itemCount} objects");
+                    string countStr = (itemCount == -1) ? "Error" : itemCount.ToString();
+                    allDocsPerTableList.Add($"{tableData.DbName} - {tableData.TableName} - {countStr} objects");
                 }
             }
             cmbListObjCounts.Items.AddRange([.. allDocsPerTableList]);
@@ -1115,7 +1133,7 @@ public partial class CosmosExplorerForm : Form
             btnListObjCounts.Text = "List Object Counts (All Tables)";
         }
     }
-private async void BtnCountMaxDocuments_Click(object sender, EventArgs e)
+    private async void BtnCountMaxDocuments_Click(object sender, EventArgs e)
     {
         if (!validateHelper()) return;
         try
@@ -1464,9 +1482,21 @@ private async void BtnCountMaxDocuments_Click(object sender, EventArgs e)
             btnInvestigate.Text = "Investigate Document";
         }
     }
-    private bool CheckRule(JToken? dbToken, string userOperator, string userValue)
+    private bool CheckRule(JToken? dbToken, string userOperator, string userValue, int depth = 0)
     {
         if (dbToken == null) return false;
+        if (depth > 10)
+        {
+            // overflow risk, some bugged data or malicious stuff
+            DialogResult result = MessageBox.Show(
+                $"Extreme recursion depth detected ({depth}).\n\n" +
+                "Continue scanning? (Click No to abort this branch)",
+                "Stack Overflow Risk",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.No) return false;
+        }
 
         // jsonArray check, rule engine upgrade
         if (dbToken is JArray jsonArr)
@@ -1481,7 +1511,7 @@ private async void BtnCountMaxDocuments_Click(object sender, EventArgs e)
                 }
                 return false;
             }
-            foreach (JToken item in jsonArr) if (CheckRule(item, userOperator, userValue)) return true;
+            foreach (JToken item in jsonArr) if (CheckRule(item, userOperator, userValue, depth + 1)) return true;
             return false;
         }
         string dbVal = dbToken.ToString();

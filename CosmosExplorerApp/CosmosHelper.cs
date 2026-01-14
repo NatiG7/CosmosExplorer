@@ -397,7 +397,7 @@ namespace cloudApp
             }
             catch (Exception)
             {
-                return 0;
+                return -1;
             }
             return 0;
         }
@@ -426,6 +426,7 @@ namespace cloudApp
             }
             catch
             {
+                // let calling method handle the exception.
                 throw;
             }
         }
