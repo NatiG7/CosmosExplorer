@@ -142,6 +142,10 @@ partial class CosmosExplorerForm
     private System.Windows.Forms.ComboBox cmbInvOp3;
     private System.Windows.Forms.DataGridView dgvInvResults;
     private System.Windows.Forms.Button btnSearchItems;
+    private System.Windows.Forms.Button btnListObjCounts;
+    private System.Windows.Forms.ComboBox cmbListObjCounts;
+    private System.Windows.Forms.Button btnMaxObjCounts;
+    private System.Windows.Forms.TextBox txtMaxObjCountsResult;
 
     // Logging fields
     private System.Windows.Forms.Panel pnlLogArea;
@@ -746,6 +750,40 @@ partial class CosmosExplorerForm
         this.rtbReadItemResult.ReadOnly = true;
         this.rtbReadItemResult.BackColor = System.Drawing.SystemColors.Window;
 
+        // btnListObjCounts
+        this.btnListObjCounts = new System.Windows.Forms.Button();
+        this.btnListObjCounts.Location = new System.Drawing.Point(600, 20);
+        this.btnListObjCounts.Name = "btnListObjCounts";
+        this.btnListObjCounts.Size = new System.Drawing.Size(200, 35);
+        this.btnListObjCounts.Text = "List Object Counts (All Tables)";
+        this.btnListObjCounts.UseVisualStyleBackColor = true;
+        this.btnListObjCounts.Click += new System.EventHandler(this.BtnCountAllDocsAllTables_Click);
+
+        // cmbListObjCounts (Result for Feature A)
+        this.cmbListObjCounts = new System.Windows.Forms.ComboBox();
+        this.cmbListObjCounts.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        this.cmbListObjCounts.FormattingEnabled = true;
+        this.cmbListObjCounts.Location = new System.Drawing.Point(600, 60);
+        this.cmbListObjCounts.Name = "cmbListObjCounts";
+        this.cmbListObjCounts.Size = new System.Drawing.Size(240, 23);
+
+        // btnMaxObjCounts
+        this.btnMaxObjCounts = new System.Windows.Forms.Button();
+        this.btnMaxObjCounts.Location = new System.Drawing.Point(600, 100);
+        this.btnMaxObjCounts.Name = "btnMaxObjCounts";
+        this.btnMaxObjCounts.Size = new System.Drawing.Size(200, 35);
+        this.btnMaxObjCounts.Text = "Show Tables w/ Max Objects";
+        this.btnMaxObjCounts.UseVisualStyleBackColor = true;
+        this.btnMaxObjCounts.Click += new System.EventHandler(this.BtnCountMaxDocuments_Click);
+
+        // txtMaxObjCountsResult (Result for Feature B)
+        this.txtMaxObjCountsResult = new System.Windows.Forms.TextBox();
+        this.txtMaxObjCountsResult.Location = new System.Drawing.Point(600, 140);
+        this.txtMaxObjCountsResult.Name = "txtMaxObjCountsResult";
+        this.txtMaxObjCountsResult.ReadOnly = true;
+        this.txtMaxObjCountsResult.Size = new System.Drawing.Size(240, 23);
+        this.txtMaxObjCountsResult.PlaceholderText = "Max count result...";
+
         // -------------------------------------------------------
         // Add to TabPage
         // -------------------------------------------------------
@@ -774,6 +812,11 @@ partial class CosmosExplorerForm
         this.tabDocuments.Controls.Add(this.btnClearReadItemResult);
         // richtextbox
         this.tabDocuments.Controls.Add(this.rtbReadItemResult);
+        // specific counts
+        this.tabDocuments.Controls.Add(this.btnListObjCounts);
+        this.tabDocuments.Controls.Add(this.cmbListObjCounts);
+        this.tabDocuments.Controls.Add(this.btnMaxObjCounts);
+        this.tabDocuments.Controls.Add(this.txtMaxObjCountsResult);
 
         #endregion
 

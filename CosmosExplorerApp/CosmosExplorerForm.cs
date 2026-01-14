@@ -1078,6 +1078,103 @@ public partial class CosmosExplorerForm : Form
             btnCountItemsInDb.Text = "Count Items in DB";
         }
     }
+    private async void BtnCountAllDocsAllTables_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        try
+        {
+            btnListObjCounts.Enabled = false;
+            List<string> allDocsPerTableList = [];
+            cmbListObjCounts.Items.Clear();
+            List<string> dbNames = await helper.GetDatabasesAsync();
+            foreach (string thisDb in dbNames)
+            {
+                List<string> tableNames = await helper.GetTablesAsync(thisDb);
+                foreach (string thisTable in tableNames)
+                {
+                    CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
+                    {
+                        DbName = thisDb,
+                        TableName = thisTable
+                    };
+                    int itemCount = await helper.CountItemsInTableAsync(tableData);
+                    allDocsPerTableList.Add($"{tableData.DbName} - {tableData.TableName} - {itemCount} objects");
+                }
+            }
+            cmbListObjCounts.Items.AddRange([.. allDocsPerTableList]);
+            if (cmbListObjCounts.Items.Count > 0) cmbListObjCounts.SelectedIndex = 0;
+        }
+        catch (Exception ex)
+        {
+            btnListObjCounts.Text = "Request Failed.";
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnListObjCounts.Enabled = true;
+            btnListObjCounts.Text = "List Object Counts (All Tables)";
+        }
+    }
+private async void BtnCountMaxDocuments_Click(object sender, EventArgs e)
+    {
+        if (!validateHelper()) return;
+        try
+        {
+            btnMaxObjCounts.Enabled = false;
+            btnMaxObjCounts.Text = "Scanning...";
+
+            int maxCount = -1;
+            List<string> winners = [];
+
+            List<string> dbNames = await helper.GetDatabasesAsync();
+            foreach (string thisDb in dbNames)
+            {
+                List<string> tableNames = await helper.GetTablesAsync(thisDb);
+                foreach (string thisTable in tableNames)
+                {
+                    CosmosHelper.TableInfo tableData = new CosmosHelper.TableInfo
+                    {
+                        DbName = thisDb,
+                        TableName = thisTable
+                    };
+                    int itemCount = await helper.CountItemsInTableAsync(tableData);
+
+                    // King of the Hill Logic
+                    if (itemCount > maxCount)
+                    {
+                        maxCount = itemCount;
+                        winners.Clear(); // New record, remove old winners
+                        winners.Add($"{tableData.DbName}-{tableData.TableName}");
+                    }
+                    else if (itemCount == maxCount)
+                    {
+                        winners.Add($"{tableData.DbName}-{tableData.TableName}"); // It's a tie, add to list
+                    }
+                }
+            }
+
+            // Final Output
+            if (winners.Count > 0)
+            {
+                string allWinners = string.Join(", ", winners);
+                txtMaxObjCountsResult.Text = $"Tables: {allWinners} with {maxCount} objects";
+            }
+            else
+            {
+                txtMaxObjCountsResult.Text = "No tables found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            txtMaxObjCountsResult.Text = "Request Failed.";
+            MessageBox.Show($"Error counting items: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnMaxObjCounts.Enabled = true;
+            btnMaxObjCounts.Text = "Show Tables w/ Max Objects";
+        }
+    }
     private async void TxtCountItemsInDb_TextChanged(object sender, EventArgs e)
     {
         if (!validateHelper()) return;
