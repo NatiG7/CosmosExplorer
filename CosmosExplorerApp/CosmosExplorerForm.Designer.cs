@@ -986,16 +986,17 @@ partial class CosmosExplorerForm
 
         // dgvInvResults (The Table View)
         this.dgvInvResults = new System.Windows.Forms.DataGridView();
-        this.dgvInvResults.Location = new System.Drawing.Point(20, 310); // Same spot as RTB
-        this.dgvInvResults.Size = new System.Drawing.Size(800, 400);     // Same size as RTB
-        this.dgvInvResults.Visible = false; // Hidden by default
+        this.dgvInvResults.Location = new System.Drawing.Point(20, 310);
+        this.dgvInvResults.Size = new System.Drawing.Size(800, 400);
+        this.dgvInvResults.Visible = false; 
+        this.dgvInvResults.CellDoubleClick += DgvInvResults_CellDoubleClick;
         this.dgvInvResults.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
         this.tabInvestigation.Controls.Add(this.dgvInvResults);
 
         // btnSearchItems (The Task Button)
         this.btnSearchItems = new System.Windows.Forms.Button();
         this.btnSearchItems.Text = "Search / Filter";
-        this.btnSearchItems.Location = new System.Drawing.Point(230, 220); // Next to Investigate button
+        this.btnSearchItems.Location = new System.Drawing.Point(230, 220);
         this.btnSearchItems.Size = new System.Drawing.Size(150, 40);
         this.btnSearchItems.UseVisualStyleBackColor = true;
         this.btnSearchItems.Click += BtnSearchItems_Click;

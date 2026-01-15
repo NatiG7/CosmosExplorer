@@ -1661,6 +1661,32 @@ public partial class CosmosExplorerForm : Form
             btnSearchItems.Text = "Search / Filter";
         }
     }
+    private async void DgvInvResults_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+    {
+        if (!validateHelper()) return;
+        if (e.RowIndex < 0) return;
+        try
+        {
+            DataGridViewRow selectedRow = dgvInvResults.Rows[e.RowIndex];
+            string docId = selectedRow.Cells["ID"].Value?.ToString() ?? "";
+            string dbName = txtInvDb.Text.Trim();
+            string tableName = txtInvTable.Text.Trim();
+            JObject? thisDoc = await helper.GetItemFromCosmosAsync(dbName, tableName, docId);
+            if (thisDoc != null)
+            {
+                DocumentViewForm viewForm = new(docId, thisDoc);
+                viewForm.ShowDialog();
+            }
+        }
+        catch (Exception ex)
+        {
+            CosmosLogger.Log($"[UI] Error opening document view: {ex.Message}");
+            MessageBox.Show($"Could not retrieve document details.\n\nError: {ex.Message}",
+                            "View Error",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+        }
+    }
     private string LimitLength(string source, int maxLength)
     {
         if (string.IsNullOrEmpty(source)) return "";
