@@ -179,7 +179,7 @@ partial class CosmosExplorerForm
         // ================================
         this.components = new System.ComponentModel.Container();
         this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-        this.ClientSize = new System.Drawing.Size(870, 900);
+        this.ClientSize = new System.Drawing.Size(870, 840);
         this.Text = "Cosmos Explorer App";
 
         // ================================
